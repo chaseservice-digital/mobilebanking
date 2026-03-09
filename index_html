@@ -1,0 +1,1048 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chase Bank - Online Banking</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        * { font-family: 'Inter', sans-serif; }
+        .gradient-chase { background: linear-gradient(135deg, #0C4BB9 0%, #003087 100%); }
+        .card-hover:hover { transform: translateY(-4px); box-shadow: 0 12px 24px rgba(0,0,0,0.15); }
+        .btn-hover:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(12,75,185,0.3); }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .animate-fadeIn { animation: fadeIn 0.5s ease-out; }
+        .pin-input { width: 3rem; height: 3rem; text-align: center; font-size: 1.5rem; font-weight: bold; border: 2px solid #e5e7eb; border-radius: 0.5rem; }
+        .pin-input:focus { border-color: #0C4BB9; outline: none; }
+        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 100; align-items: center; justify-content: center; }
+        .modal.active { display: flex; }
+        .modal-content { background: white; border-radius: 1rem; max-width: 500px; width: 90%; max-height: 90vh; overflow-y: auto; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        .notification-dropdown { display: none; position: absolute; right: 0; top: 100%; margin-top: 0.5rem; width: 320px; background: white; border-radius: 1rem; box-shadow: 0 10px 40px rgba(0,0,0,0.15); border: 1px solid #e5e7eb; z-index: 50; }
+        .notification-dropdown.active { display: block; }
+        .translator-dropdown { display: none; position: absolute; right: 0; top: 100%; margin-top: 0.5rem; width: 200px; background: white; border-radius: 0.75rem; box-shadow: 0 10px 40px rgba(0,0,0,0.15); border: 1px solid #e5e7eb; z-index: 50; overflow: hidden; }
+        .translator-dropdown.active { display: block; }
+        .translator-option { padding: 0.75rem 1rem; cursor: pointer; transition: background 0.2s; display: flex; align-items: center; gap: 0.5rem; }
+        .translator-option:hover { background: #f3f4f6; }
+        .translator-option.active { background: #dbeafe; color: #1e40af; }
+        .login-actions { position: fixed; top: 1rem; right: 1rem; display: flex; gap: 0.75rem; z-index: 60; }
+        .login-action-btn { width: 44px; height: 44px; background: rgba(255,255,255,0.15); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.2); border-radius: 0.75rem; display: flex; align-items: center; justify-content: center; color: white; cursor: pointer; transition: all 0.2s; }
+        .login-action-btn:hover { background: rgba(255,255,255,0.25); transform: translateY(-2px); }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Login Page -->
+    <div id="loginPage" class="min-h-screen gradient-chase flex items-center justify-center p-4">
+        <!-- Login Actions (Contact Us & Translator) -->
+        <div class="login-actions">
+            <button onclick="showContactModal()" class="login-action-btn" title="Contact Us">
+                <i class="fas fa-headset text-lg"></i>
+            </button>
+            <div style="position: relative;">
+                <button onclick="toggleTranslator()" class="login-action-btn" title="Change Language">
+                    <i class="fas fa-globe text-lg"></i>
+                </button>
+                <div id="translatorDropdown" class="translator-dropdown">
+                    <div class="translator-option active" onclick="changeLanguage('en')"><span class="text-lg">🇺🇸</span><span>English</span></div>
+                    <div class="translator-option" onclick="changeLanguage('es')"><span class="text-lg">🇪🇸</span><span>Español</span></div>
+                    <div class="translator-option" onclick="changeLanguage('fr')"><span class="text-lg">🇫🇷</span><span>Français</span></div>
+                    <div class="translator-option" onclick="changeLanguage('de')"><span class="text-lg">🇩🇪</span><span>Deutsch</span></div>
+                    <div class="translator-option" onclick="changeLanguage('zh')"><span class="text-lg">🇨🇳</span><span>中文</span></div>
+                    <div class="translator-option" onclick="changeLanguage('ar')"><span class="text-lg">🇸🇦</span><span>العربية</span></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="w-full max-w-md">
+            <div class="text-center mb-8">
+                <div class="inline-flex items-center justify-center w-20 h-20 bg-white rounded-2xl shadow-2xl mb-4">
+                    <i class="fas fa-university text-4xl text-[#0C4BB9]"></i>
+                </div>
+                <h1 class="text-3xl font-bold text-white mb-2" id="bankTitle">Chase Bank</h1>
+                <p class="text-blue-200" id="bankSubtitle">Online Banking</p>
+            </div>
+            <div class="bg-white rounded-2xl shadow-2xl overflow-hidden">
+                <div class="h-1 gradient-chase"></div>
+                <div class="p-8">
+                    <h2 class="text-2xl font-semibold text-center mb-1" id="loginTitle">Sign In</h2>
+                    <p class="text-gray-500 text-center text-sm mb-6" id="loginSubtitle">Access your Chase Bank account</p>
+                    <div id="loginError" class="hidden mb-4 p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm"></div>
+                    <form id="loginForm" onsubmit="handleLogin(event)">
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Email Address</label>
+                                <input type="email" id="email" placeholder="Enter your email" class="w-full h-12 px-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0C4BB9] focus:border-transparent" required>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Password</label>
+                                <div class="relative">
+                                    <input type="password" id="password" placeholder="Enter your password" class="w-full h-12 px-4 pr-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0C4BB9] focus:border-transparent" required>
+                                    <button type="button" onclick="togglePassword()" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
+                                        <i class="fas fa-eye" id="eyeIcon"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="flex items-center justify-between text-sm" id="loginOptions">
+                                <label class="flex items-center space-x-2 cursor-pointer">
+                                    <input type="checkbox" class="rounded border-gray-300">
+                                    <span class="text-gray-600">Remember me</span>
+                                </label>
+                                <button type="button" onclick="showForgotPassword()" class="text-[#0C4BB9] hover:text-[#003087] font-medium">Forgot password?</button>
+                            </div>
+                            <button type="submit" class="w-full h-12 gradient-chase text-white font-semibold rounded-lg btn-hover flex items-center justify-center">
+                                <span id="loginBtnText">Sign In</span>
+                                <i class="fas fa-arrow-right ml-2"></i>
+                            </button>
+                        </div>
+                    </form>
+                    <div class="mt-6 text-center">
+                        <button onclick="toggleEnroll()" class="text-[#0C4BB9] hover:text-[#003087] font-medium text-sm" id="enrollToggle">Not enrolled? Sign up now.</button>
+                    </div>
+                    <div class="mt-6 pt-4 border-t border-gray-200">
+                        <button onclick="showAdminLogin()" class="w-full py-2 text-sm text-gray-500 hover:text-gray-700 flex items-center justify-center gap-2">
+                            <i class="fas fa-shield-alt"></i>
+                            Customer Care Admin Access
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <p class="text-center text-blue-200 text-sm mt-6">© 2024 Chase Bank. All rights reserved.</p>
+        </div>
+    </div>
+
+    <!-- Dashboard -->
+    <div id="dashboardPage" class="hidden min-h-screen bg-gray-50">
+        <header class="bg-white border-b border-gray-200 sticky top-0 z-50">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex items-center justify-between h-16">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 gradient-chase rounded-lg flex items-center justify-center">
+                            <i class="fas fa-university text-white text-lg"></i>
+                        </div>
+                        <div>
+                            <h1 class="text-xl font-bold text-gray-900">Chase Bank</h1>
+                            <p class="text-xs text-gray-500">Online Banking</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-4">
+                        <button onclick="showSettings()" class="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors">
+                            <i class="fas fa-cog text-lg"></i>
+                        </button>
+                        <div class="relative">
+                            <button onclick="toggleNotifications()" class="relative p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors">
+                                <i class="fas fa-bell text-lg"></i>
+                                <span class="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
+                            </button>
+                            <div id="notificationDropdown" class="notification-dropdown">
+                                <div class="p-4 border-b border-gray-200"><h3 class="font-semibold text-gray-900">Notifications</h3></div>
+                                <div id="notificationList" class="max-h-80 overflow-y-auto"></div>
+                            </div>
+                        </div>
+                        <button onclick="showSettings()" class="flex items-center gap-3 hover:bg-gray-100 rounded-lg p-1 pr-3 transition-colors">
+                            <div class="text-right hidden sm:block">
+                                <p class="text-sm font-medium text-gray-900" id="headerUserName">Patrick Lormard</p>
+                                <p class="text-xs text-gray-500">Personal Account</p>
+                            </div>
+                            <div class="w-10 h-10 gradient-chase rounded-full flex items-center justify-center">
+                                <i class="fas fa-user text-white"></i>
+                            </div>
+                        </button>
+                        <button onclick="logout()" class="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors">
+                            <i class="fas fa-sign-out-alt text-lg"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div class="bg-white border border-gray-200 rounded-lg p-1 mb-6 flex flex-wrap gap-1">
+                <button onclick="switchTab('overview')" id="tab-overview" class="tab-btn flex-1 min-w-[120px] py-2 px-4 rounded-md flex items-center justify-center gap-2 bg-[#0C4BB9] text-white"><i class="fas fa-home"></i> Overview</button>
+                <button onclick="switchTab('accounts')" id="tab-accounts" class="tab-btn flex-1 min-w-[120px] py-2 px-4 rounded-md flex items-center justify-center gap-2 text-gray-700 hover:bg-gray-100"><i class="fas fa-credit-card"></i> Accounts</button>
+                <button onclick="switchTab('transfers')" id="tab-transfers" class="tab-btn flex-1 min-w-[120px] py-2 px-4 rounded-md flex items-center justify-center gap-2 text-gray-700 hover:bg-gray-100"><i class="fas fa-paper-plane"></i> Transfers</button>
+                <button onclick="switchTab('search')" id="tab-search" class="tab-btn flex-1 min-w-[120px] py-2 px-4 rounded-md flex items-center justify-center gap-2 text-gray-700 hover:bg-gray-100"><i class="fas fa-search"></i> Bank Search</button>
+            </div>
+
+            <div id="content-overview" class="tab-content active space-y-6">
+                <div class="gradient-chase rounded-2xl p-8 text-white">
+                    <h2 class="text-3xl font-bold mb-2">Welcome back, <span id="welcomeName">Patrick</span>!</h2>
+                    <p class="text-blue-100">Here's your financial overview for today.</p>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="bg-gradient-to-br from-[#0C4BB9] to-[#003087] rounded-xl p-6 text-white shadow-lg">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="p-3 bg-white/20 rounded-lg"><i class="fas fa-wallet text-xl"></i></div>
+                            <button onclick="toggleBalance()" class="p-2 hover:bg-white/20 rounded-lg transition-colors"><i class="fas fa-eye" id="balanceEye"></i></button>
+                        </div>
+                        <p class="text-blue-100 text-sm mb-1">Total Balance</p>
+                        <p class="text-3xl font-bold" id="totalBalance">$1,200,000.00</p>
+                        <p class="text-blue-200 text-xs mt-2">Account ****4532</p>
+                    </div>
+                    <div class="bg-white rounded-xl p-6 shadow-lg">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="p-3 bg-green-100 rounded-lg"><i class="fas fa-chart-line text-green-600 text-xl"></i></div>
+                            <span class="px-2 py-1 bg-green-100 text-green-700 text-xs font-medium rounded">+12.5%</span>
+                        </div>
+                        <p class="text-gray-500 text-sm mb-1">Available Balance</p>
+                        <p class="text-3xl font-bold text-gray-900" id="availableBalance">$1,140,000.00</p>
+                        <p class="text-gray-400 text-xs mt-2">Updated just now</p>
+                    </div>
+                    <div class="bg-white rounded-xl p-6 shadow-lg">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="p-3 bg-purple-100 rounded-lg"><i class="fas fa-chart-bar text-purple-600 text-xl"></i></div>
+                        </div>
+                        <p class="text-gray-500 text-sm mb-1">Monthly Activity</p>
+                        <p class="text-3xl font-bold text-gray-900">24 Transactions</p>
+                        <p class="text-gray-400 text-xs mt-2">This month</p>
+                    </div>
+                </div>
+                <div class="bg-white rounded-xl shadow-lg p-6">
+                    <h3 class="text-lg font-semibold mb-4">Quick Actions</h3>
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        <button onclick="showTopup()" class="flex flex-col items-center p-6 bg-blue-50 rounded-xl hover:bg-blue-100 transition-colors group">
+                            <div class="w-14 h-14 bg-[#0C4BB9] rounded-full flex items-center justify-center mb-3 group-hover:scale-110 transition-transform"><i class="fas fa-plus text-white text-xl"></i></div>
+                            <span class="font-medium text-gray-900">Top Up</span>
+                            <span class="text-xs text-gray-500 mt-1">Add Funds</span>
+                        </button>
+                        <button onclick="showMobileDeposit()" class="flex flex-col items-center p-6 bg-green-50 rounded-xl hover:bg-green-100 transition-colors group">
+                            <div class="w-14 h-14 bg-green-600 rounded-full flex items-center justify-center mb-3 group-hover:scale-110 transition-transform"><i class="fas fa-mobile-alt text-white text-xl"></i></div>
+                            <span class="font-medium text-gray-900">Mobile Deposit</span>
+                            <span class="text-xs text-gray-500 mt-1">Deposit Check</span>
+                        </button>
+                        <button onclick="showCheckDeposit()" class="flex flex-col items-center p-6 bg-purple-50 rounded-xl hover:bg-purple-100 transition-colors group">
+                            <div class="w-14 h-14 bg-purple-600 rounded-full flex items-center justify-center mb-3 group-hover:scale-110 transition-transform"><i class="fas fa-file-invoice text-white text-xl"></i></div>
+                            <span class="font-medium text-gray-900">Check Deposit</span>
+                            <span class="text-xs text-gray-500 mt-1">Scan & Deposit</span>
+                        </button>
+                        <button onclick="showGetCard()" class="flex flex-col items-center p-6 bg-orange-50 rounded-xl hover:bg-orange-100 transition-colors group">
+                            <div class="w-14 h-14 bg-orange-600 rounded-full flex items-center justify-center mb-3 group-hover:scale-110 transition-transform"><i class="fas fa-credit-card text-white text-xl"></i></div>
+                            <span class="font-medium text-gray-900">Get Card</span>
+                            <span class="text-xs text-gray-500 mt-1">Debit/Credit</span>
+                        </button>
+                    </div>
+                </div>
+                <div class="bg-white rounded-xl shadow-lg p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <div>
+                            <h3 class="text-lg font-semibold">Recent Transactions</h3>
+                            <p class="text-sm text-gray-500">Your latest account activity</p>
+                        </div>
+                        <button class="px-4 py-2 border border-gray-300 rounded-lg text-sm hover:bg-gray-50">View All <i class="fas fa-chevron-right ml-1"></i></button>
+                    </div>
+                    <div class="space-y-3" id="transactionsList"></div>
+                </div>
+            </div>
+
+            <div id="content-accounts" class="tab-content space-y-6">
+                <div class="bg-white rounded-xl shadow-lg p-6">
+                    <h3 class="text-lg font-semibold mb-4">Your Accounts</h3>
+                    <div class="gradient-chase rounded-xl p-6 text-white mb-4">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-blue-100 text-sm">Chase Private Client</p>
+                                <p class="text-2xl font-bold mt-1">Checking Account</p>
+                                <p class="text-blue-200 text-sm mt-1">****4532</p>
+                            </div>
+                            <div class="text-right">
+                                <p class="text-3xl font-bold" id="accountBalance">$1,200,000.00</p>
+                                <p class="text-blue-200 text-sm">Current Balance</p>
+                            </div>
+                        </div>
+                        <div class="flex gap-3 mt-6">
+                            <button class="px-4 py-2 bg-white text-[#0C4BB9] rounded-lg font-medium hover:bg-blue-50"><i class="fas fa-paper-plane mr-2"></i>Transfer</button>
+                            <button class="px-4 py-2 border border-white text-white rounded-lg font-medium hover:bg-white/20"><i class="fas fa-download mr-2"></i>Statements</button>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="border border-gray-200 rounded-lg p-4">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="text-sm text-gray-500">Savings Account</p>
+                                    <p class="text-xl font-bold text-gray-900">$250,000.00</p>
+                                    <p class="text-xs text-gray-400">****7821</p>
+                                </div>
+                                <div class="p-3 bg-blue-100 rounded-lg"><i class="fas fa-chart-line text-blue-600"></i></div>
+                            </div>
+                        </div>
+                        <div class="border border-gray-200 rounded-lg p-4">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="text-sm text-gray-500">Investment Account</p>
+                                    <p class="text-xl font-bold text-gray-900">$450,000.00</p>
+                                    <p class="text-xs text-gray-400">****3456</p>
+                                </div>
+                                <div class="p-3 bg-green-100 rounded-lg"><i class="fas fa-chart-bar text-green-600"></i></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="content-transfers" class="tab-content space-y-6">
+                <div class="bg-white rounded-xl shadow-lg p-6">
+                    <h3 class="text-lg font-semibold mb-1">Transfer Money</h3>
+                    <p class="text-sm text-gray-500 mb-6">Send money to other US banks. Requires PIN and agent approval.</p>
+                    <div class="space-y-4">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">From Account</label>
+                                <select class="w-full h-12 px-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0C4BB9]">
+                                    <option>Chase Private Client - $1,200,000.00</option>
+                                    <option>Savings Account - $250,000.00</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">To Bank *</label>
+                                <select id="transferBank" class="w-full h-12 px-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0C4BB9]">
+                                    <option value="">Select a bank</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Account Holder Name *</label>
+                                <input type="text" id="transferHolder" placeholder="Enter recipient's full name" class="w-full h-12 px-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0C4BB9]">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">To Account Number *</label>
+                                <input type="text" id="transferAccount" placeholder="Enter account number" class="w-full h-12 px-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0C4BB9]">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Amount *</label>
+                            <div class="relative">
+                                <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 text-lg">$</span>
+                                <input type="number" id="transferAmount" placeholder="0.00" class="w-full h-12 pl-10 pr-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0C4BB9] text-lg">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Memo (Optional)</label>
+                            <input type="text" id="transferMemo" placeholder="Add a note for this transfer" class="w-full h-12 px-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0C4BB9]">
+                        </div>
+                        <div class="bg-amber-50 border border-amber-200 rounded-lg p-4">
+                            <div class="flex items-start gap-3">
+                                <i class="fas fa-shield-alt text-amber-600 mt-0.5"></i>
+                                <div>
+                                    <p class="font-medium text-amber-800">Security Notice</p>
+                                    <p class="text-sm text-amber-700">This transfer requires your 4-digit PIN and approval from a customer care agent before completion.</p>
+                                </div>
+                            </div>
+                        </div>
+                        <button onclick="submitTransfer()" class="w-full h-12 gradient-chase text-white font-semibold rounded-lg btn-hover"><i class="fas fa-paper-plane mr-2"></i>Continue to PIN Verification</button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="content-search" class="tab-content space-y-6">
+                <div class="bg-white rounded-xl shadow-lg p-6">
+                    <h3 class="text-lg font-semibold mb-1">Bank Account Search</h3>
+                    <p class="text-sm text-gray-500 mb-6">Search for accounts across USA banks</p>
+                    <div class="flex gap-4 mb-6">
+                        <div class="flex-1 relative">
+                            <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                            <input type="text" id="bankSearch" placeholder="Search by bank name, account holder, or account number..." class="w-full h-14 pl-12 pr-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0C4BB9] text-lg">
+                        </div>
+                        <button onclick="searchBanks()" class="h-14 px-8 gradient-chase text-white font-semibold rounded-lg btn-hover"><i class="fas fa-search mr-2"></i>Search</button>
+                    </div>
+                    <div class="bg-blue-50 rounded-lg p-4 mb-6">
+                        <p class="text-sm font-medium text-blue-900 mb-2">Supported Banks:</p>
+                        <div class="flex flex-wrap gap-2" id="supportedBanks"></div>
+                    </div>
+                    <div id="searchResults" class="space-y-4"></div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Admin Panel -->
+    <div id="adminPage" class="hidden min-h-screen bg-gray-100">
+        <header class="bg-gray-900 text-white">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex items-center justify-between h-16">
+                    <div class="flex items-center gap-3">
+                        <i class="fas fa-shield-alt text-2xl"></i>
+                        <div>
+                            <h1 class="text-xl font-bold">Customer Care Admin</h1>
+                            <p class="text-xs text-gray-400">Account Management System</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-4">
+                        <div class="text-right">
+                            <p class="text-sm font-medium">Admin User</p>
+                            <p class="text-xs text-gray-400">Level 3 Access</p>
+                        </div>
+                        <button onclick="logout()" class="p-2 text-white hover:bg-gray-800 rounded-lg"><i class="fas fa-sign-out-alt text-lg"></i></button>
+                    </div>
+                </div>
+            </div>
+        </header>
+        <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+                <div class="bg-white rounded-xl shadow p-6">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm text-gray-500">Total Accounts</p>
+                            <p class="text-3xl font-bold">1</p>
+                        </div>
+                        <div class="p-3 bg-blue-100 rounded-lg"><i class="fas fa-users text-blue-600 text-xl"></i></div>
+                    </div>
+                </div>
+                <div class="bg-white rounded-xl shadow p-6">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm text-gray-500">Active Accounts</p>
+                            <p class="text-3xl font-bold text-green-600" id="activeCount">1</p>
+                        </div>
+                        <div class="p-3 bg-green-100 rounded-lg"><i class="fas fa-check-circle text-green-600 text-xl"></i></div>
+                    </div>
+                </div>
+                <div class="bg-white rounded-xl shadow p-6">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm text-gray-500">Locked Accounts</p>
+                            <p class="text-3xl font-bold text-red-600" id="lockedCount">0</p>
+                        </div>
+                        <div class="p-3 bg-red-100 rounded-lg"><i class="fas fa-lock text-red-600 text-xl"></i></div>
+                    </div>
+                </div>
+                <div class="bg-white rounded-xl shadow p-6">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm text-gray-500">Total Assets</p>
+                            <p class="text-3xl font-bold" id="totalAssets">$1,200,000.00</p>
+                        </div>
+                        <div class="p-3 bg-purple-100 rounded-lg"><i class="fas fa-dollar-sign text-purple-600 text-xl"></i></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white border border-gray-200 rounded-lg p-1 mb-6 flex gap-1">
+                <button onclick="switchAdminTab('accounts')" id="admin-tab-accounts" class="flex-1 py-2 px-4 rounded-md flex items-center justify-center gap-2 bg-gray-800 text-white"><i class="fas fa-users"></i> Accounts</button>
+                <button onclick="switchAdminTab('transfers')" id="admin-tab-transfers" class="flex-1 py-2 px-4 rounded-md flex items-center justify-center gap-2 text-gray-700 hover:bg-gray-100"><i class="fas fa-paper-plane"></i> Pending Transfers <span id="pendingBadge" class="hidden px-2 py-0.5 bg-red-500 text-white text-xs rounded-full">0</span></button>
+            </div>
+
+            <div id="admin-content-accounts" class="admin-tab-content">
+                <div class="bg-white rounded-xl shadow-lg">
+                    <div class="p-6 border-b border-gray-200">
+                        <h3 class="text-lg font-semibold">Account Management</h3>
+                        <p class="text-sm text-gray-500">View and manage customer accounts</p>
+                    </div>
+                    <div class="p-6">
+                        <div class="overflow-x-auto">
+                            <table class="w-full">
+                                <thead>
+                                    <tr class="border-b border-gray-200">
+                                        <th class="text-left py-3 px-4 font-medium text-gray-500">Account Holder</th>
+                                        <th class="text-left py-3 px-4 font-medium text-gray-500">Email</th>
+                                        <th class="text-left py-3 px-4 font-medium text-gray-500">Account</th>
+                                        <th class="text-right py-3 px-4 font-medium text-gray-500">Balance</th>
+                                        <th class="text-center py-3 px-4 font-medium text-gray-500">Status</th>
+                                        <th class="text-right py-3 px-4 font-medium text-gray-500">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="adminAccountsTable"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="admin-content-transfers" class="admin-tab-content hidden">
+                <div class="bg-white rounded-xl shadow-lg">
+                    <div class="p-6 border-b border-gray-200">
+                        <h3 class="text-lg font-semibold">Pending Transfer Approvals</h3>
+                        <p class="text-sm text-gray-500">Review and approve customer transfer requests</p>
+                    </div>
+                    <div class="p-6" id="pendingTransfersList">
+                        <div class="text-center py-12">
+                            <i class="fas fa-check-circle text-6xl text-green-500 mb-4"></i>
+                            <p class="text-gray-500">No pending transfers</p>
+                            <p class="text-sm text-gray-400 mt-1">All transfer requests have been processed</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modals -->
+    <div id="settingsModal" class="modal">
+        <div class="modal-content p-6">
+            <div class="flex items-center justify-between mb-6">
+                <h3 class="text-xl font-semibold flex items-center gap-2"><i class="fas fa-cog text-[#0C4BB9]"></i> Account Settings</h3>
+                <button onclick="closeModal('settingsModal')" class="text-gray-400 hover:text-gray-600"><i class="fas fa-times text-xl"></i></button>
+            </div>
+            <div class="space-y-6">
+                <div class="flex items-center gap-4">
+                    <div class="w-20 h-20 gradient-chase rounded-full flex items-center justify-center"><i class="fas fa-user text-white text-3xl"></i></div>
+                    <div>
+                        <p class="text-xl font-bold text-gray-900" id="settingsName">Patrick Lormard</p>
+                        <p class="text-sm text-gray-500">Chase Private Client</p>
+                    </div>
+                </div>
+                <div class="space-y-3">
+                    <div class="flex items-center gap-3 p-4 bg-gray-50 rounded-lg"><i class="fas fa-calendar text-gray-400"></i><div><p class="text-sm text-gray-500">Date of Birth</p><p class="font-medium text-gray-900" id="settingsDob">22 Aug 1961</p></div></div>
+                    <div class="flex items-center gap-3 p-4 bg-gray-50 rounded-lg"><i class="fas fa-map-marker-alt text-gray-400"></i><div><p class="text-sm text-gray-500">Location</p><p class="font-medium text-gray-900" id="settingsLocation">Savannah, Georgia</p></div></div>
+                    <div class="flex items-center gap-3 p-4 bg-gray-50 rounded-lg"><i class="fas fa-phone text-gray-400"></i><div><p class="text-sm text-gray-500">Phone Number</p><p class="font-medium text-gray-900" id="settingsPhone">+1 (912) 555-0147</p></div></div>
+                    <div class="flex items-center gap-3 p-4 bg-gray-50 rounded-lg"><i class="fas fa-credit-card text-gray-400"></i><div><p class="text-sm text-gray-500">Account Number</p><p class="font-medium text-gray-900">****4532</p></div></div>
+                </div>
+                <div class="border-t border-gray-200 pt-4">
+                    <p class="text-sm font-medium text-gray-700 mb-3">Security Settings</p>
+                    <div class="space-y-2">
+                        <button onclick="closeModal('settingsModal'); showModal('changePasswordModal');" class="w-full flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"><div class="flex items-center gap-3"><i class="fas fa-lock text-gray-400"></i><span class="font-medium text-gray-900">Change Password</span></div><i class="fas fa-chevron-right text-gray-400"></i></button>
+                        <button onclick="closeModal('settingsModal'); showModal('changeEmailModal');" class="w-full flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"><div class="flex items-center gap-3"><i class="fas fa-envelope text-gray-400"></i><span class="font-medium text-gray-900">Change Email</span></div><i class="fas fa-chevron-right text-gray-400"></i></button>
+                    </div>
+                </div>
+                <button onclick="closeModal('settingsModal')" class="w-full h-12 bg-gray-100 text-gray-700 font-semibold rounded-lg hover:bg-gray-200">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="changePasswordModal" class="modal">
+        <div class="modal-content p-6 max-w-md">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-xl font-semibold flex items-center gap-2"><i class="fas fa-lock text-[#0C4BB9]"></i> Change Password</h3>
+                <button onclick="closeModal('changePasswordModal')" class="text-gray-400 hover:text-gray-600"><i class="fas fa-times text-xl"></i></button>
+            </div>
+            <div class="space-y-4">
+                <div><label class="block text-sm font-medium text-gray-700 mb-1">Current Password</label><input type="password" id="currentPassword" placeholder="Enter current password" class="w-full h-12 px-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0C4BB9]"></div>
+                <div><label class="block text-sm font-medium text-gray-700 mb-1">New Password</label><input type="password" id="newPassword" placeholder="Enter new password" class="w-full h-12 px-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0C4BB9]"></div>
+                <div><label class="block text-sm font-medium text-gray-700 mb-1">Confirm New Password</label><input type="password" id="confirmPassword" placeholder="Confirm new password" class="w-full h-12 px-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0C4BB9]"></div>
+                <button onclick="updatePassword()" class="w-full h-12 gradient-chase text-white font-semibold rounded-lg btn-hover">Update Password</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="changeEmailModal" class="modal">
+        <div class="modal-content p-6 max-w-md">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-xl font-semibold flex items-center gap-2"><i class="fas fa-envelope text-[#0C4BB9]"></i> Change Email Address</h3>
+                <button onclick="closeModal('changeEmailModal')" class="text-gray-400 hover:text-gray-600"><i class="fas fa-times text-xl"></i></button>
+            </div>
+            <div class="space-y-4">
+                <div class="bg-gray-50 rounded-lg p-3"><p class="text-sm text-gray-500">Current Email</p><p class="font-medium text-gray-900" id="currentEmailDisplay">patrick.lormard@email.com</p></div>
+                <div><label class="block text-sm font-medium text-gray-700 mb-1">New Email Address</label><input type="email" id="newEmail" placeholder="Enter new email" class="w-full h-12 px-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0C4BB9]"></div>
+                <div><label class="block text-sm font-medium text-gray-700 mb-1">Password</label><input type="password" id="emailPassword" placeholder="Enter password to confirm" class="w-full h-12 px-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0C4BB9]"></div>
+                <button onclick="updateEmail()" class="w-full h-12 gradient-chase text-white font-semibold rounded-lg btn-hover">Update Email</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="pinModal" class="modal">
+        <div class="modal-content p-6 max-w-sm">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-xl font-semibold flex items-center gap-2"><i class="fas fa-lock text-[#0C4BB9]"></i> Enter PIN</h3>
+                <button onclick="closeModal('pinModal')" class="text-gray-400 hover:text-gray-600"><i class="fas fa-times text-xl"></i></button>
+            </div>
+            <p class="text-gray-500 text-sm mb-6">Please enter your 4-digit PIN to authorize this transfer.</p>
+            <div class="flex justify-center gap-3 mb-6">
+                <input type="password" maxlength="1" class="pin-input" onkeyup="movePinFocus(0, event)">
+                <input type="password" maxlength="1" class="pin-input" onkeyup="movePinFocus(1, event)">
+                <input type="password" maxlength="1" class="pin-input" onkeyup="movePinFocus(2, event)">
+                <input type="password" maxlength="1" class="pin-input" onkeyup="movePinFocus(3, event)">
+            </div>
+            <button onclick="verifyPin()" class="w-full h-12 gradient-chase text-white font-semibold rounded-lg btn-hover">Verify PIN</button>
+        </div>
+    </div>
+
+    <div id="contactAgentModal" class="modal">
+        <div class="modal-content p-6 max-w-md">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-xl font-semibold flex items-center gap-2 text-amber-600"><i class="fas fa-shield-alt"></i> Security Verification Required</h3>
+                <button onclick="closeModal('contactAgentModal')" class="text-gray-400 hover:text-gray-600"><i class="fas fa-times text-xl"></i></button>
+            </div>
+            <div class="space-y-4">
+                <div class="bg-amber-50 border border-amber-200 rounded-lg p-4">
+                    <div class="flex items-start gap-3">
+                        <i class="fas fa-shield-alt text-amber-600 mt-0.5"></i>
+                        <div>
+                            <p class="font-medium text-amber-800">Transfer Authorization Required</p>
+                            <p class="text-sm text-amber-700 mt-1">For your security, this transfer requires additional verification by a customer care agent.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-blue-50 rounded-lg p-4">
+                    <p class="text-sm font-medium text-blue-900 mb-2">Please contact customer care:</p>
+                    <div class="space-y-2">
+                        <div class="flex items-center gap-2 text-blue-800"><i class="fas fa-phone w-4"></i><span class="font-medium">+1 (555) 123-4567</span></div>
+                        <div class="flex items-center gap-2 text-blue-800"><i class="fas fa-envelope w-4"></i><span>agent.chaseservice@gmail.com</span></div>
+                    </div>
+                </div>
+                <div class="text-sm text-gray-500">
+                    <p>Reference your account: <span class="font-medium text-gray-700">****4532</span></p>
+                    <p class="mt-1">Our agents are available 24/7 to assist you with this transfer.</p>
+                </div>
+                <button onclick="closeModal('contactAgentModal')" class="w-full h-12 bg-gray-100 text-gray-700 font-semibold rounded-lg hover:bg-gray-200">I Understand</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="topupModal" class="modal">
+        <div class="modal-content p-6 max-w-md">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-xl font-semibold flex items-center gap-2 text-green-600"><i class="fas fa-plus"></i> Top Up Account</h3>
+                <button onclick="closeModal('topupModal')" class="text-gray-400 hover:text-gray-600"><i class="fas fa-times text-xl"></i></button>
+            </div>
+            <p class="text-gray-600 mb-4">Add funds to your Chase account instantly.</p>
+            <div class="space-y-4">
+                <div><label class="block text-sm font-medium text-gray-700 mb-1">Amount</label><div class="relative"><span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 text-lg">$</span><input type="number" placeholder="0.00" class="w-full h-12 pl-10 pr-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 text-lg"></div></div>
+                <div><label class="block text-sm font-medium text-gray-700 mb-1">From</label><select class="w-full h-12 px-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500"><option>External Bank Account</option><option>Debit Card</option><option>Cash Deposit</option></select></div>
+                <button onclick="closeModal('topupModal')" class="w-full h-12 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-700">Continue</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="mobileDepositModal" class="modal">
+        <div class="modal-content p-6 max-w-md">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-xl font-semibold flex items-center gap-2 text-green-600"><i class="fas fa-mobile-alt"></i> Mobile Deposit</h3>
+                <button onclick="closeModal('mobileDepositModal')" class="text-gray-400 hover:text-gray-600"><i class="fas fa-times text-xl"></i></button>
+            </div>
+            <div class="bg-green-50 border border-green-200 rounded-lg p-6 text-center mb-4">
+                <div class="w-24 h-24 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4"><i class="fas fa-qrcode text-green-600 text-4xl"></i></div>
+                <p class="text-green-800 font-medium">Scan Check to Deposit</p>
+                <p class="text-sm text-green-600 mt-2">Position your check within the frame</p>
+            </div>
+            <div class="space-y-4">
+                <div><label class="block text-sm font-medium text-gray-700 mb-1">Check Amount</label><div class="relative"><span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 text-lg">$</span><input type="number" placeholder="0.00" class="w-full h-12 pl-10 pr-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 text-lg"></div></div>
+                <button onclick="closeModal('mobileDepositModal')" class="w-full h-12 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-700">Capture Check</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="checkDepositModal" class="modal">
+        <div class="modal-content p-6 max-w-md">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-xl font-semibold flex items-center gap-2 text-purple-600"><i class="fas fa-file-invoice"></i> Check Deposit</h3>
+                <button onclick="closeModal('checkDepositModal')" class="text-gray-400 hover:text-gray-600"><i class="fas fa-times text-xl"></i></button>
+            </div>
+            <p class="text-gray-600 mb-4">Deposit a check by entering the details below.</p>
+            <div class="space-y-4">
+                <div><label class="block text-sm font-medium text-gray-700 mb-1">Check Number</label><input type="text" placeholder="Enter check number" class="w-full h-12 px-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500"></div>
+                <div><label class="block text-sm font-medium text-gray-700 mb-1">Amount</label><div class="relative"><span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 text-lg">$</span><input type="number" placeholder="0.00" class="w-full h-12 pl-10 pr-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 text-lg"></div></div>
+                <div><label class="block text-sm font-medium text-gray-700 mb-1">Payee Name</label><input type="text" placeholder="Enter payee name" class="w-full h-12 px-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500"></div>
+                <button onclick="closeModal('checkDepositModal')" class="w-full h-12 bg-purple-600 text-white font-semibold rounded-lg hover:bg-purple-700">Submit Deposit</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="getCardModal" class="modal">
+        <div class="modal-content p-6 max-w-md">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-xl font-semibold flex items-center gap-2 text-orange-600"><i class="fas fa-credit-card"></i> Request New Card</h3>
+                <button onclick="closeModal('getCardModal')" class="text-gray-400 hover:text-gray-600"><i class="fas fa-times text-xl"></i></button>
+            </div>
+            <p class="text-gray-600 mb-4">Choose the type of card you'd like to request.</p>
+            <div class="grid grid-cols-2 gap-4 mb-4">
+                <button class="p-6 border-2 border-gray-200 rounded-xl hover:border-[#0C4BB9] transition-colors text-center"><div class="w-16 h-10 bg-gradient-to-r from-blue-600 to-blue-800 rounded-lg mx-auto mb-3"></div><p class="font-medium text-gray-900">Debit Card</p><p class="text-xs text-gray-500 mt-1">Instant Issue</p></button>
+                <button class="p-6 border-2 border-gray-200 rounded-xl hover:border-[#0C4BB9] transition-colors text-center"><div class="w-16 h-10 bg-gradient-to-r from-purple-600 to-purple-800 rounded-lg mx-auto mb-3"></div><p class="font-medium text-gray-900">Credit Card</p><p class="text-xs text-gray-500 mt-1">Apply Now</p></button>
+            </div>
+            <button onclick="closeModal('getCardModal')" class="w-full h-12 border border-gray-300 text-gray-700 font-semibold rounded-lg hover:bg-gray-50">Cancel</button>
+        </div>
+    </div>
+
+    <div id="editAccountModal" class="modal">
+        <div class="modal-content p-6 max-w-md">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-xl font-semibold flex items-center gap-2 text-[#0C4BB9]"><i class="fas fa-cog"></i> Edit Account Details</h3>
+                <button onclick="closeModal('editAccountModal')" class="text-gray-400 hover:text-gray-600"><i class="fas fa-times text-xl"></i></button>
+            </div>
+            <div class="space-y-4">
+                <div><label class="block text-sm font-medium text-gray-700 mb-1">Account Holder Name</label><input type="text" id="editName" placeholder="Enter full name" class="w-full h-12 px-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0C4BB9]"></div>
+                <div><label class="block text-sm font-medium text-gray-700 mb-1">Date of Birth</label><input type="text" id="editDob" placeholder="e.g., 22 Aug 1961" class="w-full h-12 px-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0C4BB9]"></div>
+                <div><label class="block text-sm font-medium text-gray-700 mb-1">Account Balance ($)</label><input type="number" id="editBalance" placeholder="Enter balance" class="w-full h-12 px-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0C4BB9]"></div>
+                <div><label class="block text-sm font-medium text-gray-700 mb-1">Location</label><input type="text" id="editLocation" placeholder="e.g., Savannah, Georgia" class="w-full h-12 px-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0C4BB9]"></div>
+                <div><label class="block text-sm font-medium text-gray-700 mb-1">Phone Number</label><input type="text" id="editPhone" placeholder="e.g., +1 (912) 555-0147" class="w-full h-12 px-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0C4BB9]"></div>
+                <div class="flex gap-3 pt-4">
+                    <button onclick="closeModal('editAccountModal')" class="flex-1 h-12 border border-gray-300 text-gray-700 font-semibold rounded-lg hover:bg-gray-50">Cancel</button>
+                    <button onclick="saveAccountChanges()" class="flex-1 h-12 gradient-chase text-white font-semibold rounded-lg btn-hover"><i class="fas fa-check mr-2"></i>Save Changes</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="lockModal" class="modal">
+        <div class="modal-content p-6 max-w-md">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-xl font-semibold flex items-center gap-2 text-red-600"><i class="fas fa-lock"></i> Lock Account</h3>
+                <button onclick="closeModal('lockModal')" class="text-gray-400 hover:text-gray-600"><i class="fas fa-times text-xl"></i></button>
+            </div>
+            <p class="text-gray-600 mb-4">You are about to lock the account for <span id="lockUserName" class="font-medium"></span>. This will prevent them from accessing online banking.</p>
+            <div class="space-y-4">
+                <div><label class="block text-sm font-medium text-gray-700 mb-1">Reason for locking (required)</label><textarea id="lockReason" placeholder="Enter the reason for locking this account..." class="w-full h-24 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 resize-none"></textarea></div>
+                <div class="flex gap-3">
+                    <button onclick="closeModal('lockModal')" class="flex-1 h-12 border border-gray-300 text-gray-700 font-semibold rounded-lg hover:bg-gray-50">Cancel</button>
+                    <button onclick="confirmLock()" class="flex-1 h-12 bg-red-600 text-white font-semibold rounded-lg hover:bg-red-700">Confirm Lock</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="reviewModal" class="modal">
+        <div class="modal-content p-6 max-w-md">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-xl font-semibold flex items-center gap-2"><i class="fas fa-paper-plane text-[#0C4BB9]"></i> Review Transfer Request</h3>
+                <button onclick="closeModal('reviewModal')" class="text-gray-400 hover:text-gray-600"><i class="fas fa-times text-xl"></i></button>
+            </div>
+            <div id="reviewTransferDetails" class="space-y-3 mb-4"></div>
+            <div class="flex gap-3">
+                <button onclick="closeModal('reviewModal')" class="flex-1 h-12 border border-gray-300 text-gray-700 font-semibold rounded-lg hover:bg-gray-50">Cancel</button>
+                <button onclick="rejectTransfer()" class="flex-1 h-12 bg-red-600 text-white font-semibold rounded-lg hover:bg-red-700"><i class="fas fa-times mr-2"></i>Reject</button>
+                <button onclick="approveTransfer()" class="flex-1 h-12 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-700"><i class="fas fa-check mr-2"></i>Approve</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="crashModal" class="modal">
+        <div class="modal-content p-6 max-w-md">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-xl font-semibold flex items-center gap-2 text-red-600"><i class="fas fa-exclamation-triangle"></i> System Error</h3>
+                <button onclick="closeModal('crashModal')" class="text-gray-400 hover:text-gray-600"><i class="fas fa-times text-xl"></i></button>
+            </div>
+            <div id="crashContent" class="space-y-4"></div>
+            <button onclick="closeModal('crashModal')" class="w-full h-12 border border-gray-300 text-gray-700 font-semibold rounded-lg hover:bg-gray-50 mt-4">Close</button>
+        </div>
+    </div>
+
+    <div id="contactModal" class="modal">
+        <div class="modal-content p-6 max-w-md">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-xl font-semibold flex items-center gap-2 text-[#0C4BB9]"><i class="fas fa-headset"></i> <span id="contactTitle">Contact Customer Care</span></h3>
+                <button onclick="closeModal('contactModal')" class="text-gray-400 hover:text-gray-600"><i class="fas fa-times text-xl"></i></button>
+            </div>
+            <div class="space-y-4">
+                <p class="text-gray-600" id="contactDesc">Our customer care agents are available 24/7 to assist you with any questions or concerns.</p>
+                <div class="bg-blue-50 rounded-xl p-6">
+                    <div class="flex items-center gap-4 mb-4">
+                        <div class="w-14 h-14 bg-[#0C4BB9] rounded-full flex items-center justify-center"><i class="fas fa-envelope text-white text-xl"></i></div>
+                        <div><p class="text-sm text-gray-500" id="emailLabel">Email Address</p><p class="font-semibold text-gray-900 text-lg">agent.chaseservice@gmail.com</p></div>
+                    </div>
+                    <div class="flex items-center gap-4">
+                        <div class="w-14 h-14 bg-green-600 rounded-full flex items-center justify-center"><i class="fas fa-phone text-white text-xl"></i></div>
+                        <div><p class="text-sm text-gray-500" id="phoneLabel">Phone Number</p><p class="font-semibold text-gray-900 text-lg">+1 (555) 123-4567</p></div>
+                    </div>
+                </div>
+                <div class="bg-amber-50 border border-amber-200 rounded-lg p-4">
+                    <div class="flex items-start gap-3">
+                        <i class="fas fa-clock text-amber-600 mt-0.5"></i>
+                        <div><p class="font-medium text-amber-800" id="hoursTitle">Support Hours</p><p class="text-sm text-amber-700" id="hoursDesc">Available 24 hours a day, 7 days a week</p></div>
+                    </div>
+                </div>
+                <button onclick="closeModal('contactModal')" class="w-full h-12 gradient-chase text-white font-semibold rounded-lg btn-hover" id="closeContactBtn">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const CUSTOMER_CARE = { phone: '+1 (555) 123-4567', email: 'agent.chaseservice@gmail.com' };
+        const translations = {
+            en: { bankTitle: 'Chase Bank', bankSubtitle: 'Online Banking', loginTitle: 'Sign In', loginSubtitle: 'Access your Chase Bank account', emailLabel: 'Email Address', emailPlaceholder: 'Enter your email', passwordLabel: 'Password', passwordPlaceholder: 'Enter your password', rememberMe: 'Remember me', forgotPassword: 'Forgot password?', signIn: 'Sign In', enrollText: 'Not enrolled? Sign up now.', enrollTitle: 'Enroll in Online Banking', enrollSubtitle: 'Create your online banking account', enrollBtn: 'Continue Enrollment', adminAccess: 'Customer Care Admin Access', contactTitle: 'Contact Customer Care', contactDesc: 'Our customer care agents are available 24/7 to assist you with any questions or concerns.', emailLabelContact: 'Email Address', phoneLabel: 'Phone Number', hoursTitle: 'Support Hours', hoursDesc: 'Available 24 hours a day, 7 days a week', closeBtn: 'Close' },
+            es: { bankTitle: 'Chase Bank', bankSubtitle: 'Banca en Línea', loginTitle: 'Iniciar Sesión', loginSubtitle: 'Acceda a su cuenta de Chase Bank', emailLabel: 'Correo Electrónico', emailPlaceholder: 'Ingrese su correo', passwordLabel: 'Contraseña', passwordPlaceholder: 'Ingrese su contraseña', rememberMe: 'Recuérdame', forgotPassword: '¿Olvidó su contraseña?', signIn: 'Iniciar Sesión', enrollText: '¿No está inscrito? Regístrese ahora.', enrollTitle: 'Inscribirse en Banca en Línea', enrollSubtitle: 'Cree su cuenta de banca en línea', enrollBtn: 'Continuar Inscripción', adminAccess: 'Acceso de Administrador', contactTitle: 'Contactar Atención al Cliente', contactDesc: 'Nuestros agentes de atención al cliente están disponibles 24/7 para ayudarle.', emailLabelContact: 'Correo Electrónico', phoneLabel: 'Número de Teléfono', hoursTitle: 'Horario de Atención', hoursDesc: 'Disponible las 24 horas del día, 7 días a la semana', closeBtn: 'Cerrar' },
+            fr: { bankTitle: 'Chase Bank', bankSubtitle: 'Banque en Ligne', loginTitle: 'Connexion', loginSubtitle: 'Accédez à votre compte Chase Bank', emailLabel: 'Adresse Email', emailPlaceholder: 'Entrez votre email', passwordLabel: 'Mot de Passe', passwordPlaceholder: 'Entrez votre mot de passe', rememberMe: 'Se souvenir de moi', forgotPassword: 'Mot de passe oublié?', signIn: 'Se Connecter', enrollText: 'Pas inscrit? Inscrivez-vous maintenant.', enrollTitle: 'Inscription Banque en Ligne', enrollSubtitle: 'Créez votre compte bancaire en ligne', enrollBtn: 'Continuer Inscription', adminAccess: 'Accès Admin Service Client', contactTitle: 'Contacter le Service Client', contactDesc: 'Nos agents sont disponibles 24h/24 et 7j/7 pour vous aider.', emailLabelContact: 'Adresse Email', phoneLabel: 'Numéro de Téléphone', hoursTitle: 'Heures de Support', hoursDesc: 'Disponible 24 heures sur 24, 7 jours sur 7', closeBtn: 'Fermer' },
+            de: { bankTitle: 'Chase Bank', bankSubtitle: 'Online-Banking', loginTitle: 'Anmelden', loginSubtitle: 'Greifen Sie auf Ihr Chase Bank-Konto zu', emailLabel: 'E-Mail-Adresse', emailPlaceholder: 'E-Mail eingeben', passwordLabel: 'Passwort', passwordPlaceholder: 'Passwort eingeben', rememberMe: 'Angemeldet bleiben', forgotPassword: 'Passwort vergessen?', signIn: 'Anmelden', enrollText: 'Nicht registriert? Jetzt anmelden.', enrollTitle: 'Online-Banking Registrierung', enrollSubtitle: 'Erstellen Sie Ihr Online-Banking-Konto', enrollBtn: 'Registrierung Fortsetzen', adminAccess: 'Kundenbetreuung Admin-Zugang', contactTitle: 'Kundenbetreuung Kontaktieren', contactDesc: 'Unsere Kundenbetreuer stehen Ihnen rund um die Uhr zur Verfügung.', emailLabelContact: 'E-Mail-Adresse', phoneLabel: 'Telefonnummer', hoursTitle: 'Supportzeiten', hoursDesc: 'Verfügbar 24 Stunden am Tag, 7 Tage die Woche', closeBtn: 'Schließen' },
+            zh: { bankTitle: 'Chase Bank', bankSubtitle: '网上银行', loginTitle: '登录', loginSubtitle: '访问您的Chase银行账户', emailLabel: '电子邮件', emailPlaceholder: '输入您的电子邮件', passwordLabel: '密码', passwordPlaceholder: '输入您的密码', rememberMe: '记住我', forgotPassword: '忘记密码?', signIn: '登录', enrollText: '未注册? 立即注册。', enrollTitle: '注册网上银行', enrollSubtitle: '创建您的网上银行账户', enrollBtn: '继续注册', adminAccess: '客户服务管理员访问', contactTitle: '联系客户服务', contactDesc: '我们的客户服务代表全天候为您提供帮助。', emailLabelContact: '电子邮件', phoneLabel: '电话号码', hoursTitle: '支持时间', hoursDesc: '全天候24小时，每周7天可用', closeBtn: '关闭' },
+            ar: { bankTitle: 'Chase Bank', bankSubtitle: 'الخدمات المصرفية عبر الإنترنت', loginTitle: 'تسجيل الدخول', loginSubtitle: 'الوصول إلى حساب Chase Bank الخاص بك', emailLabel: 'البريد الإلكتروني', emailPlaceholder: 'أدخل بريدك الإلكتروني', passwordLabel: 'كلمة المرور', passwordPlaceholder: 'أدخل كلمة المرور', rememberMe: 'تذكرني', forgotPassword: 'نسيت كلمة المرور?', signIn: 'تسجيل الدخول', enrollText: 'غير مسجل? سجل الآن.', enrollTitle: 'التسجيل في الخدمات المصرفية', enrollSubtitle: 'إنشاء حسابك المصرفي عبر الإنترنت', enrollBtn: 'متابعة التسجيل', adminAccess: 'وصول مسؤول خدمة العملاء', contactTitle: 'الاتصال بخدمة العملاء', contactDesc: 'وكلاء خدمة العملاء لدينا متاحون على مدار الساعة لمساعدتك.', emailLabelContact: 'البريد الإلكتروني', phoneLabel: 'رقم الهاتف', hoursTitle: 'ساعات الدعم', hoursDesc: 'متاح 24 ساعة في اليوم، 7 أيام في الأسبوع', closeBtn: 'إغلاق' }
+        };
+        let currentLanguage = 'en';
+        const userData = { name: 'Patrick Lormard', email: 'patrick.lormard@email.com', accountNumber: '****4532', balance: 1200000, isLocked: false, dob: '22 Aug 1961', location: 'Savannah, Georgia', phone: '+1 (912) 555-0147' };
+        const transactions = [
+            { id: '1', date: '2024-03-08', description: 'Wire Transfer - Investment Corp', amount: 50000, type: 'credit', status: 'completed' },
+            { id: '2', date: '2024-03-07', description: 'Real Estate Purchase - Property LLC', amount: 350000, type: 'debit', status: 'completed' },
+            { id: '3', date: '2024-03-06', description: 'Stock Dividend - Tech Holdings', amount: 12500, type: 'credit', status: 'completed' },
+            { id: '4', date: '2024-03-05', description: 'Luxury Vehicle Purchase', amount: 85000, type: 'debit', status: 'completed' },
+            { id: '5', date: '2024-03-04', description: 'Consulting Fee - Global Solutions', amount: 25000, type: 'credit', status: 'completed' },
+        ];
+        const newsItems = [
+            { id: '1', title: 'Welcome to Chase Online Banking', message: 'Thank you for banking with us. Your account is now fully activated.', date: '2024-03-09', type: 'info', read: false },
+            { id: '2', title: 'New Security Features', message: 'We have enhanced our security protocols to keep your account safe.', date: '2024-03-08', type: 'security', read: false },
+            { id: '3', title: 'Mobile App Update', message: 'Download our new mobile app for easier banking on the go.', date: '2024-03-07', type: 'update', read: true },
+            { id: '4', title: 'Transfer Limit Increased', message: 'Your daily transfer limit has been increased to $500,000.', date: '2024-03-06', type: 'info', read: true },
+            { id: '5', title: 'Scheduled Maintenance', message: 'System maintenance scheduled for March 15, 2024 at 2:00 AM EST.', date: '2024-03-05', type: 'alert', read: false },
+        ];
+        const usaBanks = ['JPMorgan Chase', 'Bank of America', 'Wells Fargo', 'Citibank', 'Goldman Sachs', 'Morgan Stanley', 'U.S. Bank', 'PNC Bank', 'Truist', 'Capital One', 'TD Bank', 'Charles Schwab', 'State Street', 'BNY Mellon', 'HSBC USA', 'Fifth Third Bank', 'Citizens Bank', 'KeyBank', 'Ally Bank', 'Discover Bank'];
+        const mockBankAccounts = [
+            { id: '1', bankName: 'Bank of America', accountHolder: 'John Smith', accountNumber: '****7821', accountType: 'Checking', balance: 45680, routingNumber: '021000322' },
+            { id: '2', bankName: 'Wells Fargo', accountHolder: 'Sarah Johnson', accountNumber: '****9345', accountType: 'Savings', balance: 127500, routingNumber: '121042882' },
+            { id: '3', bankName: 'Citibank', accountHolder: 'Michael Chen', accountNumber: '****2156', accountType: 'Business', balance: 342000, routingNumber: '021000089' },
+            { id: '4', bankName: 'Goldman Sachs', accountHolder: 'Emma Davis', accountNumber: '****6734', accountType: 'Investment', balance: 890000, routingNumber: '026013576' },
+        ];
+        let pendingTransfers = [], currentTransfer = null, reviewingTransfer = null, isEnrollMode = false, isAdminSession = false;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedAuth = localStorage.getItem('chase_authenticated'), savedAdmin = localStorage.getItem('chase_is_admin');
+            if (savedAuth === 'true') {
+                isAdminSession = savedAdmin === 'true';
+                isAdminSession ? showAdminPanel() : showDashboard();
+            } else {
+                renderTransactions(); populateBanks(); renderSupportedBanks(); renderNotifications();
+            }
+        });
+
+        function renderNotifications() {
+            document.getElementById('notificationList').innerHTML = newsItems.map(news => `
+                <div class="p-4 border-b border-gray-100 ${!news.read ? 'bg-blue-50' : 'hover:bg-gray-50'}">
+                    <div class="flex items-start gap-3">
+                        <div class="w-2 h-2 rounded-full mt-2 ${news.type === 'security' ? 'bg-red-500' : news.type === 'alert' ? 'bg-amber-500' : news.type === 'update' ? 'bg-purple-500' : 'bg-blue-500'}"></div>
+                        <div class="flex-1"><p class="font-medium text-sm text-gray-900">${news.title}</p><p class="text-xs text-gray-500 mt-1">${news.message}</p><p class="text-xs text-gray-400 mt-1">${news.date}</p></div>
+                    </div>
+                </div>`).join('');
+        }
+        function toggleNotifications() { document.getElementById('notificationDropdown').classList.toggle('active'); }
+
+        function handleLogin(e) {
+            e.preventDefault();
+            const email = document.getElementById('email').value, password = document.getElementById('password').value, errorDiv = document.getElementById('loginError');
+            if (isEnrollMode) { showCrash('enroll'); return; }
+            if (userData.isLocked) { errorDiv.textContent = `Account is locked. Please contact customer care at ${CUSTOMER_CARE.email}.`; errorDiv.classList.remove('hidden'); return; }
+            if (email.trim() && password.trim()) {
+                userData.email = email.trim(); isAdminSession = false;
+                localStorage.setItem('chase_authenticated', 'true'); localStorage.setItem('chase_is_admin', 'false');
+                showDashboard();
+            }
+        }
+        function togglePassword() {
+            const password = document.getElementById('password'), eyeIcon = document.getElementById('eyeIcon');
+            if (password.type === 'password') { password.type = 'text'; eyeIcon.classList.remove('fa-eye'); eyeIcon.classList.add('fa-eye-slash'); }
+            else { password.type = 'password'; eyeIcon.classList.remove('fa-eye-slash'); eyeIcon.classList.add('fa-eye'); }
+        }
+        function toggleEnroll() {
+            isEnrollMode = !isEnrollMode; const t = translations[currentLanguage];
+            document.getElementById('loginTitle').textContent = isEnrollMode ? t.enrollTitle : t.loginTitle;
+            document.getElementById('loginSubtitle').textContent = isEnrollMode ? t.enrollSubtitle : t.loginSubtitle;
+            document.getElementById('loginBtnText').textContent = isEnrollMode ? t.enrollBtn : t.signIn;
+            document.getElementById('enrollToggle').textContent = isEnrollMode ? t.enrollText.replace('Not enrolled?', 'Already enrolled?').replace('Sign up now.', 'Sign in.') : t.enrollText;
+            document.getElementById('loginOptions').classList.toggle('hidden', isEnrollMode);
+        }
+        function showForgotPassword() { showCrash('forgot'); }
+        function showCrash(type) {
+            const modal = document.getElementById('crashModal'), content = document.getElementById('crashContent');
+            if (type === 'enroll') {
+                content.innerHTML = `<div class="bg-red-50 border border-red-200 rounded-lg p-4 font-mono text-sm text-red-800"><p class="font-bold">Error Code: 0x80070057</p><p class="mt-2">Exception in thread "main" java.lang.NullPointerException</p><p class="mt-1">at com.chase.enrollment.RegistrationServlet.processRequest(RegistrationServlet.java:142)</p><p>at com.chase.enrollment.RegistrationServlet.doPost(RegistrationServlet.java:89)</p><p class="mt-2 text-xs text-red-600">Database connection timeout. Enrollment service unavailable.</p></div><p class="text-gray-600">We apologize for the inconvenience. Our enrollment system is currently experiencing technical difficulties. Please try again later or visit a Chase branch near you.</p>`;
+            } else {
+                content.innerHTML = `<div class="bg-red-50 border border-red-200 rounded-lg p-4 font-mono text-sm text-red-800"><p class="font-bold">Error Code: 0x80131500</p><p class="mt-2">System.IO.IOException: The password reset service is not responding.</p><p class="mt-1">at Chase.Identity.PasswordResetService.GenerateToken(PasswordResetService.cs:256)</p><p class="mt-2 text-xs text-red-600">SMTP server connection failed. Email service down.</p></div><p class="text-gray-600">The password reset feature is temporarily unavailable due to system maintenance. Please contact customer service at ${CUSTOMER_CARE.email} for assistance.</p>`;
+            }
+            modal.classList.add('active');
+        }
+        function showAdminLogin() {
+            const username = prompt('Admin Username:'); if (!username) return;
+            const password = prompt('Admin Password:'); if (!password) return;
+            if (username === 'admin' && password === 'admin123') {
+                isAdminSession = true; localStorage.setItem('chase_authenticated', 'true'); localStorage.setItem('chase_is_admin', 'true');
+                showAdminPanel();
+            } else { alert('Invalid admin credentials.'); }
+        }
+
+        function showDashboard() {
+            document.getElementById('loginPage').classList.add('hidden'); document.getElementById('adminPage').classList.add('hidden'); document.getElementById('dashboardPage').classList.remove('hidden');
+            updateDashboardInfo(); renderTransactions(); populateBanks(); renderSupportedBanks(); renderNotifications();
+        }
+        function updateDashboardInfo() {
+            document.getElementById('headerUserName').textContent = userData.name;
+            document.getElementById('welcomeName').textContent = userData.name.split(' ')[0];
+            document.getElementById('totalBalance').textContent = formatCurrency(userData.balance);
+            document.getElementById('availableBalance').textContent = formatCurrency(userData.balance * 0.95);
+            document.getElementById('accountBalance').textContent = formatCurrency(userData.balance);
+            document.getElementById('settingsName').textContent = userData.name;
+            document.getElementById('settingsDob').textContent = userData.dob;
+            document.getElementById('settingsLocation').textContent = userData.location;
+            document.getElementById('settingsPhone').textContent = userData.phone;
+        }
+        function showAdminPanel() {
+            document.getElementById('loginPage').classList.add('hidden'); document.getElementById('dashboardPage').classList.add('hidden'); document.getElementById('adminPage').classList.remove('hidden');
+            renderAdminAccounts(); renderPendingTransfers();
+        }
+        function logout() {
+            localStorage.removeItem('chase_authenticated'); localStorage.removeItem('chase_is_admin'); isAdminSession = false;
+            document.getElementById('dashboardPage').classList.add('hidden'); document.getElementById('adminPage').classList.add('hidden'); document.getElementById('loginPage').classList.remove('hidden');
+            document.getElementById('email').value = ''; document.getElementById('password').value = '';
+        }
+
+        function switchTab(tab) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(el => { el.classList.remove('bg-[#0C4BB9]', 'text-white'); el.classList.add('text-gray-700', 'hover:bg-gray-100'); });
+            document.getElementById('content-' + tab).classList.add('active');
+            const btn = document.getElementById('tab-' + tab); btn.classList.remove('text-gray-700', 'hover:bg-gray-100'); btn.classList.add('bg-[#0C4BB9]', 'text-white');
+        }
+        function toggleBalance() {
+            const totalEl = document.getElementById('totalBalance'), availableEl = document.getElementById('availableBalance'), eye = document.getElementById('balanceEye');
+            if (totalEl.textContent === '****') { totalEl.textContent = formatCurrency(userData.balance); availableEl.textContent = formatCurrency(userData.balance * 0.95); eye.classList.remove('fa-eye-slash'); eye.classList.add('fa-eye'); }
+            else { totalEl.textContent = '****'; availableEl.textContent = '****'; eye.classList.remove('fa-eye'); eye.classList.add('fa-eye-slash'); }
+        }
+        function renderTransactions() {
+            document.getElementById('transactionsList').innerHTML = transactions.slice(0, 5).map(t => `
+                <div class="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                    <div class="flex items-center gap-4">
+                        <div class="w-10 h-10 rounded-full flex items-center justify-center ${t.type === 'credit' ? 'bg-green-100' : 'bg-red-100'}"><i class="fas fa-${t.type === 'credit' ? 'plus text-green-600' : 'minus text-red-600'}"></i></div>
+                        <div><p class="font-medium text-gray-900">${t.description}</p><p class="text-sm text-gray-500">${t.date}</p></div>
+                    </div>
+                    <div class="text-right"><p class="font-semibold ${t.type === 'credit' ? 'text-green-600' : 'text-red-600'}">${t.type === 'credit' ? '+' : '-'}${formatCurrency(t.amount)}</p><span class="px-2 py-0.5 border border-gray-300 text-xs rounded">${t.status}</span></div>
+                </div>`).join('');
+        }
+
+        function populateBanks() {
+            const select = document.getElementById('transferBank');
+            usaBanks.forEach(bank => { const option = document.createElement('option'); option.value = bank; option.textContent = bank; select.appendChild(option); });
+        }
+        function submitTransfer() {
+            const bank = document.getElementById('transferBank').value, account = document.getElementById('transferAccount').value, holder = document.getElementById('transferHolder').value, amount = document.getElementById('transferAmount').value;
+            if (!bank || !account || !amount || !holder) { alert('Please fill in all required fields.'); return; }
+            currentTransfer = { bank, account, holder, amount, memo: document.getElementById('transferMemo').value };
+            document.getElementById('pinModal').classList.add('active');
+        }
+        function movePinFocus(index, event) { const inputs = document.querySelectorAll('.pin-input'); if (event.target.value && index < 3) inputs[index + 1].focus(); }
+        function verifyPin() {
+            const inputs = document.querySelectorAll('.pin-input'), pin = Array.from(inputs).map(i => i.value).join('');
+            if (pin.length !== 4) { alert('Please enter a 4-digit PIN.'); return; }
+            const newTransfer = { id: Date.now().toString(), toBank: currentTransfer.bank, toAccount: currentTransfer.account, accountHolder: currentTransfer.holder, amount: parseFloat(currentTransfer.amount), memo: currentTransfer.memo || '', fromAccount: 'Chase Private Client - ****4532', requestedAt: new Date().toISOString(), status: 'pending' };
+            pendingTransfers.push(newTransfer);
+            const pending = pendingTransfers.filter(t => t.status === 'pending'), badge = document.getElementById('pendingBadge');
+            if (badge) { badge.textContent = pending.length; badge.classList.remove('hidden'); }
+            closeModal('pinModal'); inputs.forEach(i => i.value = '');
+            alert(`Transfer request of ${formatCurrency(newTransfer.amount)} to ${newTransfer.toBank} has been submitted for agent approval.`);
+            document.getElementById('contactAgentModal').classList.add('active');
+            document.getElementById('transferBank').value = ''; document.getElementById('transferAccount').value = ''; document.getElementById('transferHolder').value = ''; document.getElementById('transferAmount').value = ''; document.getElementById('transferMemo').value = '';
+        }
+
+        function renderSupportedBanks() {
+            document.getElementById('supportedBanks').innerHTML = usaBanks.slice(0, 10).map(b => `<span class="px-3 py-1 bg-white text-blue-700 text-sm rounded-full border border-blue-200"><i class="fas fa-university mr-1"></i>${b}</span>`).join('') + '<span class="px-3 py-1 bg-white text-blue-700 text-sm rounded-full border border-blue-200">+10 more</span>';
+        }
+        function searchBanks() {
+            const query = document.getElementById('bankSearch').value.toLowerCase(), container = document.getElementById('searchResults');
+            if (!query) { container.innerHTML = ''; return; }
+            const results = mockBankAccounts.filter(acc => acc.bankName.toLowerCase().includes(query) || acc.accountHolder.toLowerCase().includes(query) || acc.accountNumber.includes(query));
+            if (results.length === 0) { container.innerHTML = `<div class="text-center py-12"><i class="fas fa-search text-6xl text-gray-300 mb-4"></i><p class="text-gray-500">No accounts found matching your search.</p></div>`; return; }
+            container.innerHTML = results.map(acc => `
+                <div class="border border-gray-200 rounded-lg p-4 hover:border-[#0C4BB9] transition-colors cursor-pointer">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-4"><div class="w-12 h-12 bg-[#0C4BB9] rounded-lg flex items-center justify-center"><i class="fas fa-university text-white text-xl"></i></div><div><p class="font-semibold text-gray-900">${acc.bankName}</p><p class="text-sm text-gray-500">${acc.accountHolder}</p><p class="text-xs text-gray-400">${acc.accountNumber} • ${acc.accountType}</p></div></div>
+                        <div class="text-right"><p class="text-xl font-bold text-gray-900">${formatCurrency(acc.balance)}</p><p class="text-xs text-gray-400">Routing: ${acc.routingNumber}</p></div>
+                    </div>
+                </div>`).join('');
+        }
+
+        function switchAdminTab(tab) {
+            document.querySelectorAll('.admin-tab-content').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('[id^="admin-tab-"]').forEach(el => { el.classList.remove('bg-gray-800', 'text-white'); el.classList.add('text-gray-700', 'hover:bg-gray-100'); });
+            document.getElementById('admin-content-' + tab).classList.remove('hidden');
+            const btn = document.getElementById('admin-tab-' + tab); btn.classList.remove('text-gray-700', 'hover:bg-gray-100'); btn.classList.add('bg-gray-800', 'text-white');
+            if (tab === 'transfers') renderPendingTransfers();
+        }
+        function renderAdminAccounts() {
+            document.getElementById('adminAccountsTable').innerHTML = `
+                <tr class="border-b border-gray-100 hover:bg-gray-50">
+                    <td class="py-4 px-4"><div class="flex items-center gap-3"><div class="w-10 h-10 bg-[#0C4BB9] rounded-full flex items-center justify-center"><i class="fas fa-user text-white"></i></div><span class="font-medium">${userData.name}</span></div></td>
+                    <td class="py-4 px-4 text-gray-600">${userData.email}</td>
+                    <td class="py-4 px-4 text-gray-600">${userData.accountNumber}</td>
+                    <td class="py-4 px-4 text-right font-medium">${formatCurrency(userData.balance)}</td>
+                    <td class="py-4 px-4 text-center">${userData.isLocked ? '<span class="px-2 py-1 bg-red-100 text-red-700 text-sm rounded-full"><i class="fas fa-lock mr-1"></i>Locked</span>' : '<span class="px-2 py-1 bg-green-100 text-green-700 text-sm rounded-full"><i class="fas fa-unlock mr-1"></i>Active</span>'}</td>
+                    <td class="py-4 px-4 text-right"><div class="flex items-center justify-end gap-2"><button onclick="showEditAccountModal()" class="px-3 py-1.5 border border-[#0C4BB9] text-[#0C4BB9] rounded-lg text-sm font-medium hover:bg-blue-50"><i class="fas fa-cog mr-1"></i>Edit</button><button onclick="${userData.isLocked ? 'unlockAccount()' : 'showLockModal()'}" class="px-3 py-1.5 ${userData.isLocked ? 'border border-gray-300 text-gray-700' : 'bg-red-600 text-white'} rounded-lg text-sm font-medium hover:opacity-90"><i class="fas fa-${userData.isLocked ? 'unlock' : 'lock'} mr-1"></i>${userData.isLocked ? 'Unlock' : 'Lock'}</button></div></td>
+                </tr>`;
+            document.getElementById('activeCount').textContent = userData.isLocked ? '0' : '1';
+            document.getElementById('lockedCount').textContent = userData.isLocked ? '1' : '0';
+            document.getElementById('totalAssets').textContent = formatCurrency(userData.balance);
+        }
+        function showEditAccountModal() {
+            document.getElementById('editName').value = userData.name; document.getElementById('editDob').value = userData.dob; document.getElementById('editBalance').value = userData.balance;
+            document.getElementById('editLocation').value = userData.location; document.getElementById('editPhone').value = userData.phone; document.getElementById('editAccountModal').classList.add('active');
+        }
+        function saveAccountChanges() {
+            userData.name = document.getElementById('editName').value; userData.dob = document.getElementById('editDob').value;
+            userData.balance = parseFloat(document.getElementById('editBalance').value) || 0; userData.location = document.getElementById('editLocation').value; userData.phone = document.getElementById('editPhone').value;
+            updateDashboardInfo(); renderAdminAccounts(); closeModal('editAccountModal'); alert('Account updated successfully!');
+        }
+        function showLockModal() { document.getElementById('lockUserName').textContent = userData.name; document.getElementById('lockModal').classList.add('active'); }
+        function confirmLock() {
+            const reason = document.getElementById('lockReason').value;
+            if (!reason.trim()) { alert('Please enter a reason for locking.'); return; }
+            userData.isLocked = true; closeModal('lockModal'); document.getElementById('lockReason').value = ''; renderAdminAccounts();
+        }
+        function unlockAccount() { userData.isLocked = false; renderAdminAccounts(); }
+        function renderPendingTransfers() {
+            const container = document.getElementById('pendingTransfersList'), pending = pendingTransfers.filter(t => t.status === 'pending');
+            document.getElementById('pendingBadge').textContent = pending.length; document.getElementById('pendingBadge').classList.toggle('hidden', pending.length === 0);
+            if (pending.length === 0) { container.innerHTML = `<div class="text-center py-12"><i class="fas fa-check-circle text-6xl text-green-500 mb-4"></i><p class="text-gray-500">No pending transfers</p><p class="text-sm text-gray-400 mt-1">All transfer requests have been processed</p></div>`; return; }
+            container.innerHTML = pending.map(t => `
+                <div class="border border-gray-200 rounded-lg p-4 mb-4">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-4"><div class="w-12 h-12 bg-amber-100 rounded-lg flex items-center justify-center"><i class="fas fa-clock text-amber-600 text-xl"></i></div><div><p class="font-semibold text-gray-900">Transfer to ${t.toBank}</p><p class="text-sm text-gray-500">Account: ${t.toAccount}</p><p class="text-sm text-gray-500">Holder: ${t.accountHolder}</p>${t.memo ? `<p class="text-xs text-gray-400 mt-1">Memo: ${t.memo}</p>` : ''}</div></div>
+                        <div class="text-right"><p class="text-2xl font-bold text-[#0C4BB9]">${formatCurrency(t.amount)}</p><p class="text-xs text-gray-400">${new Date(t.requestedAt).toLocaleString()}</p><button onclick="showReviewModal('${t.id}')" class="mt-3 px-4 py-1.5 border border-gray-300 rounded-lg text-sm hover:bg-gray-50">Review</button></div>
+                    </div>
+                </div>`).join('');
+        }
+        function showReviewModal(id) {
+            reviewingTransfer = pendingTransfers.find(t => t.id === id); if (!reviewingTransfer) return;
+            document.getElementById('reviewTransferDetails').innerHTML = `
+                <div class="bg-blue-50 rounded-lg p-4"><p class="text-3xl font-bold text-[#0C4BB9]">${formatCurrency(reviewingTransfer.amount)}</p><p class="text-sm text-blue-600 mt-1">Transfer Amount</p></div>
+                <div class="space-y-2"><div class="flex justify-between"><span class="text-gray-500">To Bank:</span> <span class="font-medium">${reviewingTransfer.toBank}</span></div><div class="flex justify-between"><span class="text-gray-500">Account Number:</span> <span class="font-medium">${reviewingTransfer.toAccount}</span></div><div class="flex justify-between"><span class="text-gray-500">Account Holder:</span> <span class="font-medium">${reviewingTransfer.accountHolder}</span></div><div class="flex justify-between"><span class="text-gray-500">From Account:</span> <span class="font-medium">${reviewingTransfer.fromAccount}</span></div>${reviewingTransfer.memo ? `<div class="flex justify-between"><span class="text-gray-500">Memo:</span> <span class="font-medium">${reviewingTransfer.memo}</span></div>` : ''}<div class="flex justify-between"><span class="text-gray-500">Requested:</span> <span class="font-medium">${new Date(reviewingTransfer.requestedAt).toLocaleString()}</span></div></div>`;
+            document.getElementById('reviewModal').classList.add('active');
+        }
+        function approveTransfer() {
+            if (!reviewingTransfer) return;
+            userData.balance -= reviewingTransfer.amount;
+            const newTransaction = { id: Date.now().toString(), date: new Date().toISOString().split('T')[0], description: `Transfer to ${reviewingTransfer.toBank} - ${reviewingTransfer.accountHolder}`, amount: reviewingTransfer.amount, type: 'debit', status: 'completed' };
+            transactions.unshift(newTransaction);
+            reviewingTransfer.status = 'approved';
+            closeModal('reviewModal'); renderPendingTransfers(); renderAdminAccounts(); updateDashboardInfo(); renderTransactions();
+            alert(`Transfer of ${formatCurrency(reviewingTransfer.amount)} has been approved and deducted from the account balance.`);
+        }
+        function rejectTransfer() { if (!reviewingTransfer) return; reviewingTransfer.status = 'rejected'; closeModal('reviewModal'); renderPendingTransfers(); }
+
+        function showSettings() { document.getElementById('settingsModal').classList.add('active'); document.getElementById('currentEmailDisplay').textContent = userData.email; }
+        function updatePassword() {
+            const current = document.getElementById('currentPassword').value, newPass = document.getElementById('newPassword').value, confirm = document.getElementById('confirmPassword').value;
+            if (newPass !== confirm) { alert('Passwords do not match!'); return; }
+            if (newPass.length < 6) { alert('Password must be at least 6 characters!'); return; }
+            alert('Password changed successfully!'); document.getElementById('currentPassword').value = ''; document.getElementById('newPassword').value = ''; document.getElementById('confirmPassword').value = ''; closeModal('changePasswordModal');
+        }
+        function updateEmail() {
+            const newEmail = document.getElementById('newEmail').value;
+            if (!newEmail.includes('@')) { alert('Please enter a valid email address!'); return; }
+            userData.email = newEmail; document.getElementById('currentEmailDisplay').textContent = newEmail; alert('Email changed successfully!');
+            document.getElementById('newEmail').value = ''; document.getElementById('emailPassword').value = ''; closeModal('changeEmailModal');
+        }
+
+        function showTopup() { document.getElementById('topupModal').classList.add('active'); }
+        function showMobileDeposit() { document.getElementById('mobileDepositModal').classList.add('active'); }
+        function showCheckDeposit() { document.getElementById('checkDepositModal').classList.add('active'); }
+        function showGetCard() { document.getElementById('getCardModal').classList.add('active'); }
+        function showModal(id) { document.getElementById(id).classList.add('active'); }
+        function closeModal(id) { document.getElementById(id).classList.remove('active'); }
+        function formatCurrency(amount) { return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 2 }).format(amount); }
+
+        document.querySelectorAll('.modal').forEach(modal => { modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(modal.id); }); });
+        document.addEventListener('click', (e) => {
+            const dropdown = document.getElementById('notificationDropdown'), bell = document.querySelector('[onclick=\"toggleNotifications()\"]');
+            if (!dropdown.contains(e.target) && e.target !== bell && !bell.contains(e.target)) dropdown.classList.remove('active');
+        });
+        document.addEventListener('click', (e) => {
+            const dropdown = document.getElementById('translatorDropdown'), btn = document.querySelector('[onclick=\"toggleTranslator()\"]');
+            if (!dropdown.contains(e.target) && e.target !== btn && !btn.contains(e.target)) dropdown.classList.remove('active');
+        });
+
+        function toggleTranslator() { document.getElementById('translatorDropdown').classList.toggle('active'); }
+        function changeLanguage(lang) {
+            currentLanguage = lang; const t = translations[lang];
+            document.getElementById('bankTitle').textContent = t.bankTitle; document.getElementById('bankSubtitle').textContent = t.bankSubtitle;
+            document.getElementById('loginTitle').textContent = isEnrollMode ? t.enrollTitle : t.loginTitle; document.getElementById('loginSubtitle').textContent = isEnrollMode ? t.enrollSubtitle : t.loginSubtitle;
+            const labels = document.querySelectorAll('#loginForm label'); if (labels[0]) labels[0].textContent = t.emailLabel; if (labels[1]) labels[1].textContent = t.passwordLabel;
+            document.getElementById('email').placeholder = t.emailPlaceholder; document.getElementById('password').placeholder = t.passwordPlaceholder;
+            const rememberSpan = document.querySelector('#loginOptions span'); if (rememberSpan) rememberSpan.textContent = t.rememberMe;
+            const forgotBtn = document.querySelector('#loginOptions button'); if (forgotBtn) forgotBtn.textContent = t.forgotPassword;
+            document.getElementById('loginBtnText').textContent = isEnrollMode ? t.enrollBtn : t.signIn;
+            document.getElementById('enrollToggle').textContent = isEnrollMode ? t.enrollText.replace('Not enrolled?', 'Already enrolled?').replace('Sign up now.', 'Sign in.') : t.enrollText;
+            const adminBtn = document.querySelector('[onclick=\"showAdminLogin()\"]'); if (adminBtn) adminBtn.innerHTML = `<i class=\"fas fa-shield-alt\"></i> ${t.adminAccess}`;
+            document.getElementById('contactTitle').textContent = t.contactTitle; document.getElementById('contactDesc').textContent = t.contactDesc;
+            document.getElementById('emailLabel').textContent = t.emailLabelContact; document.getElementById('phoneLabel').textContent = t.phoneLabel;
+            document.getElementById('hoursTitle').textContent = t.hoursTitle; document.getElementById('hoursDesc').textContent = t.hoursDesc; document.getElementById('closeContactBtn').textContent = t.closeBtn;
+            document.querySelectorAll('.translator-option').forEach(opt => opt.classList.remove('active'));
+            event.target.closest('.translator-option').classList.add('active');
+            document.getElementById('translatorDropdown').classList.remove('active');
+        }
+        function showContactModal() { document.getElementById('contactModal').classList.add('active'); }
+        setInterval(() => { if (!document.getElementById('adminPage').classList.contains('hidden')) renderPendingTransfers(); }, 2000);
+    </script>
+</body>
+</html>
